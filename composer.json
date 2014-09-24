@@ -1,0 +1,15 @@
+{
+    "name": "arthurhoaro/favicon",
+    "description": "PHP library for discovering favicons",
+    "authors": [
+        {
+            "name": "Your Name",
+            "homepage": "http://shiflett.org/"
+        },
+        {
+            "name": "Arthur Hoaro",
+            "homepage": "http://hoa.ro"
+        }
+    ],
+    "minimum-stability": "dev"
+}
