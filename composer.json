@@ -11,5 +11,7 @@
             "homepage": "http://hoa.ro"
         }
     ],
-    "minimum-stability": "dev"
+    "autoload": {
+        "psr-0": { "Favicon\\": "src/" }
+    }
 }

@@ -1,5 +1,7 @@
 <?php
 
+namespace Favicon;
+
 class Favicon
 {
     protected $url = '';
