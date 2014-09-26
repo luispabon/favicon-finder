@@ -36,7 +36,6 @@ class Favicon_Autoloader
 			return;
 		}
 
-		$filename = $this->path . DIRECTORY_SEPARATOR . str_replace('_', DIRECTORY_SEPARATOR, $class) . '.php';
-		include $filename;
+		include $class . '.php';
 	}
 }
