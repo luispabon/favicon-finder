@@ -5,7 +5,7 @@ namespace Favicon;
 class Favicon
 {
     protected $url = '';
-    protected $default = '';
+    protected $defaultImg = '';
     protected $cacheDir;
     protected $cacheTimeout;
 
@@ -15,8 +15,8 @@ class Favicon
             $this->url = $args['url'];
         }
 
-        if (isset($args['default'])) {
-            $this->default = $args['default'];
+        if (isset($args['defaultImg'])) {
+            $this->defaultImg = $args['defaultImg'];
         }
     }
 
@@ -104,6 +104,7 @@ class Favicon
         }
 
         // Get the base URL without the path for clearer concatenations.
+        $original = $this->url;
         $url = rtrim($this->baseUrl($this->url), '/');
 
         $found = FALSE;
@@ -128,36 +129,26 @@ class Favicon
             }
         }
 
-        // See if it's specified in a link tag.
+        // See if it's specified in a link tag in domain url.
         if (!$found) {
-            $html = file_get_contents("{$url}/");
-            preg_match('!<head.*?>.*</head>!ims', $html, $match);
-            $head = $match[0];
-
-            $dom = new DOMDocument();
-            // Use error supression, because the HTML might be too malformed.
-            if (@$dom->loadHTML($head)) {
-                $links = $dom->getElementsByTagName('link');
-                // TODO: Improve this to adhere to a determined precedence.
-                foreach ($links as $link) {
-                    if ($link->hasAttribute('rel') && strtolower($link->getAttribute('rel')) == 'shortcut icon') {
-                        $favicon = $link->getAttribute('href');
-                        $found = TRUE;
-                    } elseif ($link->hasAttribute('rel') && strtolower($link->getAttribute('rel')) == 'icon') {
-                        $favicon = $link->getAttribute('href');
-                        $found = TRUE;
-                    } elseif ($link->hasAttribute('href') && strpos($link->getAttribute('href'), 'favicon') !== FALSE) {
-                        $favicon = $link->getAttribute('href');
-                        $found = TRUE;
-                    }
-                }
+            $found = $this->getInPage($url);
+        }
+        // See if it's specified in a link tag in given url.
+        if (!$found) {
+            if( $found = $this->getInPage($original) ) {
+                $url = $original;
             }
         }
 
+        if($found !== false) {
+            $favicon = $found;
+            $found = TRUE;
+        }
+        
         // Make sure the favicon is an absolute URL.
         $parsed = parse_url($favicon);
         if (!isset($parsed['scheme'])) {
-            $favicon = $url . $parsed['path'];
+            $favicon = $url . '/' . $parsed['path'];
         }
 
         // Sometimes people lie, so check the status.
@@ -176,8 +167,31 @@ class Favicon
 
             return $favicon;
         } else {
-            return $this->default;
+            return $this->defaultImg;
         }
+    }
+    
+    private function getInPage($url) {
+        $html = file_get_contents("{$url}/");
+        preg_match('!<head.*?>.*</head>!ims', $html, $match);
+        $head = $match[0];
+            
+        $dom = new \DOMDocument();
+        // Use error supression, because the HTML might be too malformed.
+        if (@$dom->loadHTML($head)) {
+            $links = $dom->getElementsByTagName('link');
+            // TODO: Improve this to adhere to a determined precedence.
+            foreach ($links as $link) {
+                if ($link->hasAttribute('rel') && strtolower($link->getAttribute('rel')) == 'shortcut icon') {
+                    return $link->getAttribute('href');
+                } elseif ($link->hasAttribute('rel') && strtolower($link->getAttribute('rel')) == 'icon') {
+                    return $link->getAttribute('href');
+                } elseif ($link->hasAttribute('href') && strpos($link->getAttribute('href'), 'favicon') !== FALSE) {
+                    return $link->getAttribute('href');
+                }
+            }
+        }
+        return false;
     }
 }
 
