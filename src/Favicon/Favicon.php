@@ -193,6 +193,70 @@ class Favicon
         }
         return false;
     }
+    
+    /**
+     * @return mixed
+     */
+    public function getCacheDir()
+    {
+        return $this->cacheDir;
+    }
+
+    /**
+     * @param mixed $cacheDir
+     */
+    public function setCacheDir($cacheDir)
+    {
+        $this->cacheDir = $cacheDir;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCacheTimeout()
+    {
+        return $this->cacheTimeout;
+    }
+
+    /**
+     * @param mixed $cacheTimeout
+     */
+    public function setCacheTimeout($cacheTimeout)
+    {
+        $this->cacheTimeout = $cacheTimeout;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDefaultImg()
+    {
+        return $this->defaultImg;
+    }
+
+    /**
+     * @param string $default
+     */
+    public function setDefaultImg($defaultImg)
+    {
+        $this->defaultImg = $defaultImg;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrl()
+    {
+        return $this->url;
+    }
+
+    /**
+     * @param string $url
+     */
+    public function setUrl($url)
+    {
+        $this->url = $url;
+    }
 }
 
 ?>
