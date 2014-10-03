@@ -5,7 +5,7 @@ namespace Favicon;
 class Favicon
 {
     protected $url = '';
-    protected $defaultImg = '';
+    protected $defaultImg = '/resources/default.gif';
     protected $cacheDir;
     protected $cacheTimeout;
 
@@ -20,7 +20,7 @@ class Favicon
         }
     }
 
-    public function cache($args) {
+    public function cache($args = array()) {
         if (isset($args['dir'])) {
             $this->cacheDir = $args['dir'];
         } else {
