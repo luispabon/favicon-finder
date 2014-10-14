@@ -5,38 +5,34 @@ namespace Favicon;
 class Favicon
 {
     protected $url = '';
-    protected $defaultImg = '/resources/default.gif';
     protected $cacheDir;
     protected $cacheTimeout;
+    protected $dataAccess;
 
     public function __construct($args = array())
     {
         if (isset($args['url'])) {
             $this->url = $args['url'];
         }
-
-        if (isset($args['defaultImg'])) {
-            $this->defaultImg = $args['defaultImg'];
-        }
+        
+        $this->dataAccess = new DataAccess();
     }
 
     public function cache($args = array()) {
         if (isset($args['dir'])) {
             $this->cacheDir = $args['dir'];
         } else {
-            $this->cacheDir = '/tmp';
+            $this->cacheDir = __DIR__ . '/../../resources/cache';
         }
 
-        if (isset($args['timeout'])) {
-            if ($args['timeout']) {
+        if (!empty($args['timeout'])) {
                 $this->cacheTimeout = $args['timeout'];
-            } else {
+        } else {
                 $this->cacheTimeout = 0;
-            }
         }
     }
 
-    public static function baseUrl($url)
+    public static function baseUrl($url, $path = false)
     {
         $return = '';
 
@@ -45,7 +41,7 @@ class Favicon
         }
 
         // Scheme
-        $scheme = strtolower($url['scheme']);
+        $scheme = isset($url['scheme']) ? strtolower($url['scheme']) : null;
         if ($scheme != 'http' && $scheme != 'https') {
 
             return FALSE;
@@ -62,6 +58,10 @@ class Favicon
         }
 
         // Hostname
+        if( !isset($url['host']) ) {
+            return FALSE;
+        }
+        
         $return .= $url['host'];
 
         // Port
@@ -70,18 +70,33 @@ class Favicon
         }
 
         // Path
+        if( $path && isset($url['path']) ) {
+            $return .= $url['path'];
+        }
         $return .= '/';
 
         return $return;    
     }
 
-    public static function info($url)
+    public function info($url)
     {
+        if(empty($url) || $url === false) {
+            return false;
+        }
+        
+        $max_loop = 5;
+        
         // Discover real status by following redirects. 
         $loop = TRUE;
-        while ($loop) {
-            $headers = get_headers($url, TRUE);
-            list(,$status) = explode(' ', $headers[0]);
+        while ($loop && $max_loop-- > 0) {
+            $headers = $this->dataAccess->retrieveHeader($url);
+            $exploded = explode(' ', $headers[0]);
+            
+            if( !isset($exploded[1]) ) { 
+                return false;
+            }
+            list(,$status) = $exploded;
+            
             switch ($status) {
                 case '301':
                 case '302':
@@ -95,7 +110,16 @@ class Favicon
 
         return array('status' => $status, 'url' => $url);
     }
+    
+    public function endRedirect($url) {
+        $out = $this->info($url);
+        return !empty($out['url']) ? $out['url'] : false;
+    }
 
+    /**
+     * Find remote (or cached) favicon
+     * @return favicon URL, false if nothing was found
+     **/
     public function get($url = '')
     {
         // URLs passed to this method take precedence.
@@ -104,83 +128,75 @@ class Favicon
         }
 
         // Get the base URL without the path for clearer concatenations.
-        $original = $this->url;
-        $url = rtrim($this->baseUrl($this->url), '/');
+        $original = rtrim($this->baseUrl($this->url, true), '/');
+        $url = rtrim($this->endRedirect($this->baseUrl($this->url, false)), '/');
 
-        $found = FALSE;
-
-        // Check the cache first.
-        if ($this->cacheTimeout) {
-            $cache = $this->cacheDir . '/' . md5($url);
-            if (file_exists($cache) && is_readable($cache) && (time() - filemtime($cache) < $this->cacheTimeout)) {
-                $favicon = file_get_contents($cache);
-                $found = TRUE;
-            }
-        } else {
-            $cache = FALSE;
+        if(($favicon = $this->checkCache($url)) || ($favicon = $this->getFavicon($url))) {
+            $base = true;
         }
-
-        if (!$found) {
-            // Try /favicon.ico first.
+        elseif(($favicon = $this->checkCache($original)) || ($favicon = $this->getFavicon($original, false))) {
+            $base = false;    
+        }
+        else
+            return false;
+            
+        // Save cache if necessary
+        $cache = $this->cacheDir . '/' . md5($base ? $url : $original);
+        if ($this->cacheTimeout && !file_exists($cache) || (is_writable($cache) && time() - filemtime($cache) > $this->cacheTimeout)) {
+            $this->dataAccess->saveCache($cache, $favicon);
+        }
+        
+        return $favicon;
+    }
+    
+    private function getFavicon($url, $checkDefault = true) {
+        $favicon = false;
+        
+        if(empty($url)) {
+            return false;
+        }
+        
+        // Try /favicon.ico first.
+        if( $checkDefault ) {
             $info = $this->info("{$url}/favicon.ico");
             if ($info['status'] == '200') {
                 $favicon = $info['url'];
-                $found = TRUE;
             }
         }
 
         // See if it's specified in a link tag in domain url.
-        if (!$found) {
-            $found = $this->getInPage($url);
-        }
-        // See if it's specified in a link tag in given url.
-        if (!$found) {
-            if( $found = $this->getInPage($original) ) {
-                $url = $original;
-            }
-        }
-
-        if($found !== false) {
-            $favicon = $found;
-            $found = TRUE;
+        if (!$favicon) {
+            $favicon = $this->getInPage($url);
         }
         
         // Make sure the favicon is an absolute URL.
-        $parsed = parse_url($favicon);
-        if (!isset($parsed['scheme'])) {
-            $favicon = $url . '/' . $parsed['path'];
+        if( $favicon && filter_var($favicon, FILTER_VALIDATE_URL) === false ) {
+            $favicon = $url . '/' . $favicon;
         }
 
         // Sometimes people lie, so check the status.
         $info = $this->info($favicon);
-        if ($info['status'] != '200') {
-            $found = FALSE;
+        if (!isset($info['status']) || $info['status'] != '200') {
+            $favicon = false;
         }
 
-        if ($found) {
-            // Check to see if result should be cached.
-            if ($cache) {
-                if (!file_exists($cache) || (is_writable($cache) && time() - filemtime($cache) > $this->cacheTimeout)) {
-                    file_put_contents($cache, $favicon);
-                }
-            }
-
-            return $favicon;
-        } else {
-            return $this->defaultImg;
-        }
+        return $favicon;
     }
     
     private function getInPage($url) {
-        $html = file_get_contents("{$url}/");
+        $html = $this->dataAccess->retrieveUrl("{$url}/");
         preg_match('!<head.*?>.*</head>!ims', $html, $match);
+        
+        if(empty($match) || count($match) == 0) {
+            return false;
+        }
+        
         $head = $match[0];
-            
+        
         $dom = new \DOMDocument();
         // Use error supression, because the HTML might be too malformed.
         if (@$dom->loadHTML($head)) {
             $links = $dom->getElementsByTagName('link');
-            // TODO: Improve this to adhere to a determined precedence.
             foreach ($links as $link) {
                 if ($link->hasAttribute('rel') && strtolower($link->getAttribute('rel')) == 'shortcut icon') {
                     return $link->getAttribute('href');
@@ -191,6 +207,16 @@ class Favicon
                 }
             }
         }
+        return false;
+    }
+    
+    private function checkCache($url) {
+        if ($this->cacheTimeout) {
+            $cache = $this->cacheDir . '/' . md5($url);
+            if (file_exists($cache) && is_readable($cache) && (time() - filemtime($cache) < $this->cacheTimeout)) {
+                return $this->dataAccess->readCache($cache);
+            }
+        } 
         return false;
     }
     
@@ -229,22 +255,6 @@ class Favicon
     /**
      * @return string
      */
-    public function getDefaultImg()
-    {
-        return $this->defaultImg;
-    }
-
-    /**
-     * @param string $default
-     */
-    public function setDefaultImg($defaultImg)
-    {
-        $this->defaultImg = $defaultImg;
-    }
-
-    /**
-     * @return string
-     */
     public function getUrl()
     {
         return $this->url;
@@ -257,6 +267,12 @@ class Favicon
     {
         $this->url = $url;
     }
-}
 
-?>
+    /**
+     * @param DataAccess $dataAccess
+     */
+    public function setDataAccess($dataAccess)
+    {
+        $this->dataAccess = $dataAccess;
+    }
+}

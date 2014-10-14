@@ -1,3 +1,5 @@
 ### Composer ###
 composer.phar
 vendor/
+resources/cache
+!resources/cache/.gitkeep

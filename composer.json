@@ -1,6 +1,10 @@
 {
     "name": "arthurhoaro/favicon",
+    "type": "library",
     "description": "PHP library for discovering favicons",
+    "keywords": ["favicon","finder"],
+    "homepage": "http://github.com/ArthurHoaro/favicon",
+    "license": "Apache 2",
     "authors": [
         {
             "name": "Chris Shiflett",
