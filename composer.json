@@ -1,7 +1,7 @@
 {
     "name": "arthurhoaro/favicon",
     "type": "library",
-    "description": "Library for discovering favicons",
+    "description": "PHP Library used to discover favicon from given URL",
     "keywords": ["favicon","icon","finder"],
     "homepage": "https://github.com/ArthurHoaro/favicon",
     "license": "Apache-2.0",
