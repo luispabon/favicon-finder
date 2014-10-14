@@ -1,10 +1,10 @@
 {
     "name": "arthurhoaro/favicon",
     "type": "library",
-    "description": "PHP library for discovering favicons",
-    "keywords": ["favicon","finder"],
-    "homepage": "http://github.com/ArthurHoaro/favicon",
-    "license": "Apache 2",
+    "description": "Library for discovering favicons",
+    "keywords": ["favicon","icon","finder"],
+    "homepage": "https://github.com/ArthurHoaro/favicon",
+    "license": "Apache-2.0",
     "authors": [
         {
             "name": "Chris Shiflett",
@@ -15,6 +15,13 @@
             "homepage": "http://hoa.ro"
         }
     ],
+    "support": {
+        "issues": "https://github.com/ArthurHoaro/favicon/issues",
+        "sources": "https://github.com/ArthurHoaro/favicon"
+    },
+    "require": {
+        "php": ">=5.3.3"
+    },
     "autoload": {
         "psr-0": { "Favicon\\": "src/" }
     }
