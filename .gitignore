@@ -1,5 +1,7 @@
+resources/cache/*
+!.gitkeep
+index.php
+
 ### Composer ###
 composer.phar
 vendor/
-resources/cache/*
-!.gitkeep
