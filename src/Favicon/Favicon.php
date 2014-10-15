@@ -175,8 +175,8 @@ class Favicon
         }
 
         // Sometimes people lie, so check the status.
-        $info = $this->info($favicon);
-        if (!isset($info['status']) || $info['status'] != '200') {
+        // And sometimes, it's not even an image. Sneaky bastards!
+        if ($favicon && !$this->checkImageMType($favicon)) {
             $favicon = false;
         }
 
@@ -218,6 +218,21 @@ class Favicon
             }
         } 
         return false;
+    }
+    
+    private function checkImageMType($url) {
+        $tmpFile = $this->cacheDir . '/tmp.ico';
+        
+        $fileContent = $this->dataAccess->retrieveUrl($url);
+        $this->dataAccess->saveCache($tmpFile, $fileContent);
+        
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $isImage = strpos(finfo_file($finfo, $tmpFile), 'image') !== false;
+        finfo_close($finfo);
+        
+        //unlink($tmpFile);
+        
+        return $isImage;
     }
     
     /**
