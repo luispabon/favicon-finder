@@ -15,14 +15,13 @@ class Favicon
             $this->url = $args['url'];
         }
         
+        $this->cacheDir = __DIR__ . '/../../resources/cache';
         $this->dataAccess = new DataAccess();
     }
 
     public function cache($args = array()) {
         if (isset($args['dir'])) {
             $this->cacheDir = $args['dir'];
-        } else {
-            $this->cacheDir = __DIR__ . '/../../resources/cache';
         }
 
         if (!empty($args['timeout'])) {
@@ -176,7 +175,8 @@ class Favicon
 
         // Sometimes people lie, so check the status.
         // And sometimes, it's not even an image. Sneaky bastards!
-        if ($favicon && !$this->checkImageMType($favicon)) {
+        // If cacheDir isn't writable, that's not our problem
+        if ($favicon && is_writable($this->cacheDir) && !$this->checkImageMType($favicon)) {
             $favicon = false;
         }
 
@@ -230,7 +230,7 @@ class Favicon
         $isImage = strpos(finfo_file($finfo, $tmpFile), 'image') !== false;
         finfo_close($finfo);
         
-        //unlink($tmpFile);
+        unlink($tmpFile);
         
         return $isImage;
     }

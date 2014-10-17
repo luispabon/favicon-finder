@@ -356,6 +356,24 @@ class FaviconTest extends \PHPUnit_Framework_TestCase {
     }
     
     /**
+    * @covers Favicon::get
+    * @uses Favicon
+    */
+    public function testGetValidFavNoCacheSetup() {
+    	$url = 'http://domain.tld';
+        $fav = new Favicon(array('url' => $url));
+        
+        $dataAccess = $this->getMock('Favicon\DataAccess', array('retrieveHeader', 'retrieveUrl'));
+        $fav->setDataAccess($dataAccess);
+        
+        // MOCK
+        $dataAccess->expects($this->any())->method('retrieveHeader')->will($this->returnValue(array(0 => 'HTTP/1.1 200 OK')));
+        $dataAccess->expects($this->any())->method('retrieveUrl')->will($this->returnValue(file_get_contents($this->RESOURCE_FAV_ICO)));
+        
+        $this->assertEquals(self::slash($url) . $this->DEFAULT_FAV_CHECK, $fav->get());
+    }
+    
+    /**
      * Callback function for retrieveHeader in testGetExistingRootFavicon
      * If it checks default fav (favicon.ico), return 404
      * Return 200 while checking existing favicon
