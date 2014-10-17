@@ -36,4 +36,6 @@ Usage
 
     echo $favicon->get('http://hoa.ro');
     // Displays: http://hoa.ro/themes/hoaro/img/favicon.png
+    var_dump($favicon->get('http://nofavicon.tld'));
+    // Returns false
     
