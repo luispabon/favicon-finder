@@ -2,7 +2,7 @@
 // autoloader
 spl_autoload_register(array(new Favicon_Autoloader(), 'autoload'));
 
-if (!class_exists('Favicon'))
+if (!class_exists('\Favicon\Favicon'))
 {
 	trigger_error('Autoloader not registered properly', E_USER_ERROR);
 }
@@ -20,7 +20,7 @@ class Favicon_Autoloader
 	 */
 	public function __construct()
 	{
-		$this->path = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'src';
+		$this->path = dirname(__FILE__) . DIRECTORY_SEPARATOR;
 	}
 
 	/**
@@ -30,12 +30,12 @@ class Favicon_Autoloader
 	 */
 	public function autoload($class)
 	{
-		// Only load the class if it starts with "SimplePie"
 		if (strpos($class, 'Favicon') !== 0)
 		{
 			return;
 		}
 
-		include $class . '.php';
+        $parts = explode('\\', $class);
+		include $this->path . end($parts) . '.php';
 	}
 }
