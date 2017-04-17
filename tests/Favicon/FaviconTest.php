@@ -42,7 +42,7 @@ class FaviconTest extends \PHPUnit_Framework_TestCase {
     	$fav->cache();
     	
     	$this->assertTrue(is_writable($fav->getCacheDir()));
-    	$this->assertEquals(0, $fav->getCacheTimeout());
+    	$this->assertEquals(604800, $fav->getCacheTimeout());
     }
     
     /**
@@ -61,7 +61,7 @@ class FaviconTest extends \PHPUnit_Framework_TestCase {
     	
     	$this->assertEquals($dir, $fav->getCacheDir());
     	$this->assertFalse(is_writable($fav->getCacheDir()));
-    	$this->assertEquals(0, $fav->getCacheTimeout());
+    	$this->assertEquals(604800, $fav->getCacheTimeout());
     }
     
     /**
@@ -391,7 +391,7 @@ class FaviconTest extends \PHPUnit_Framework_TestCase {
         $dataAccess->expects($this->any())->method('retrieveHeader')->will($this->returnValue(array(0 => 'HTTP/1.1 200 OK')));
         $dataAccess->expects($this->any())->method('retrieveUrl')->will($this->returnValue(file_get_contents($this->RESOURCE_FAV_ICO)));
 
-        $expected = self::SANDBOX .'/'. md5('http://domain.tld/'. self::DEFAULT_FAV_CHECK);
+        $expected = md5('http://domain.tld/'. self::DEFAULT_FAV_CHECK);
         $this->assertEquals($expected, $fav->get('', FaviconDLType::DL_FILE_PATH));
     }
 

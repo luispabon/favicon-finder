@@ -8,7 +8,6 @@ class Favicon
     protected $cacheDir;
     protected $cacheTimeout;
     protected $dataAccess;
-    protected $defaultFaviconImage;
 
     public function __construct($args = array())
     {
@@ -17,7 +16,7 @@ class Favicon
         }
         
         $this->cacheDir = __DIR__ . '/../../resources/cache';
-        $this->defaultFaviconImage = __DIR__ . '/../../resources/default.ico';
+        $this->cacheTimeout = 604800;
         $this->dataAccess = new DataAccess();
     }
 
@@ -25,7 +24,6 @@ class Favicon
      * Set cache settings:
      *   - dir: cache directory
      *   - timeout: in seconds
-     *   - defaultico: path to the default favicon image
      *
      * @param array $args
      */
@@ -36,10 +34,6 @@ class Favicon
 
         if (!empty($args['timeout'])) {
             $this->cacheTimeout = $args['timeout'];
-        }
-
-        if (!empty($args['defaultico'])) {
-            $this->defaultFaviconImage = $args['defaultico'];
         }
     }
 
@@ -218,11 +212,7 @@ class Favicon
             $favicon = $this->dataAccess->retrieveUrl($faviconUrl);
             // Definitely not found
             if (!$this->checkImageMTypeContent($favicon)) {
-                if ($image) {
-                    return $this->dataAccess->readCache($this->defaultFaviconImage);
-                } else {
-                    return $this->defaultFaviconImage;
-                }
+                return false;
             } else {
                 $this->saveCache($faviconUrl, $favicon);
             }
@@ -232,7 +222,7 @@ class Favicon
             return $favicon;
         }
         else
-            return $this->cacheDir . '/' . md5($faviconUrl);
+            return md5($faviconUrl);
     }
 
     /**
