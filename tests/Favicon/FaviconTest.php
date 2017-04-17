@@ -197,7 +197,7 @@ class FaviconTest extends \PHPUnit_Framework_TestCase {
     * @covers Favicon::get
     * @uses Favicon
     */
-    public function testGetExistingRootFavicon() {
+    public function testGetExistingFavicon() {
         $url = 'http://domain.tld/';
         $path = 'sub/';
         
@@ -214,7 +214,7 @@ class FaviconTest extends \PHPUnit_Framework_TestCase {
         
         // Get from URL MOCK
         $dataAccess->expects($this->any())->method('retrieveUrl')->will($this->returnCallback(array($this, 'contentExistingFav')));
-        $this->assertEquals(self::slash($url) . self::TEST_LOGO_NAME, $fav->get());
+        $this->assertEquals(self::slash($url . $path) . self::TEST_LOGO_NAME, $fav->get());
     }
     
     /**
@@ -374,6 +374,8 @@ class FaviconTest extends \PHPUnit_Framework_TestCase {
         $dataAccess->expects($this->any())->method('retrieveUrl')->will($this->returnValue(file_get_contents($this->RESOURCE_FAV_ICO)));
         
         $this->assertEquals(self::slash($url) . self::DEFAULT_FAV_CHECK, $fav->get());
+        directory_clear(__DIR__ .'/../../resources/cache');
+        touch(__DIR__ .'/../../resources/cache/.gitkeep');
     }
 
     public function testGetDownloadedFavPath()
@@ -391,7 +393,7 @@ class FaviconTest extends \PHPUnit_Framework_TestCase {
         $dataAccess->expects($this->any())->method('retrieveHeader')->will($this->returnValue(array(0 => 'HTTP/1.1 200 OK')));
         $dataAccess->expects($this->any())->method('retrieveUrl')->will($this->returnValue(file_get_contents($this->RESOURCE_FAV_ICO)));
 
-        $expected = md5('http://domain.tld/'. self::DEFAULT_FAV_CHECK);
+        $expected = 'img'. md5('http://domain.tld');
         $this->assertEquals($expected, $fav->get('', FaviconDLType::DL_FILE_PATH));
     }
 

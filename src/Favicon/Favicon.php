@@ -4,6 +4,8 @@ namespace Favicon;
 
 class Favicon
 {
+    protected static $TYPE_CACHE_URL = 'url';
+    protected static $TYPE_CACHE_IMG = 'img';
     protected $url = '';
     protected $cacheDir;
     protected $cacheTimeout;
@@ -140,29 +142,29 @@ class Favicon
         }
 
         // Get the base URL without the path for clearer concatenations.
-        $original = rtrim($this->baseUrl($this->url, true), '/');
-        $url = rtrim($this->endRedirect($this->baseUrl($this->url, false)), '/');
+        $url = rtrim($this->baseUrl($this->url, true), '/');
+        $original = $url;
+        if (($favicon = $this->checkCache($original, self::$TYPE_CACHE_URL)) === false
+            && ! $favicon = $this->getFavicon($original, false)
+        ) {
+            $url = rtrim($this->endRedirect($this->baseUrl($this->url, false)), '/');
+            if (($favicon = $this->checkCache($url, self::$TYPE_CACHE_URL)) === false
+                && ! $favicon = $this->getFavicon($url)
+            ) {
+                $url = $original;
+            }
+        }
 
-        if(($favicon = $this->checkCache($url)) || ($favicon = $this->getFavicon($url))) {
-            $base = true;
-        }
-        elseif(($favicon = $this->checkCache($original)) || ($favicon = $this->getFavicon($original, false))) {
-            $base = false;    
-        }
-        else {
-            return false;
-        }
-
-        $this->saveCache($base ? $url : $original, $favicon);
+        $this->saveCache($url, $favicon, self::$TYPE_CACHE_URL);
 
         switch ($type) {
             case FaviconDLType::DL_FILE_PATH:
-                return $this->getImage($favicon, false);
+                return $this->getImage($url, $favicon, false);
             case FaviconDLType::RAW_IMAGE:
-                return $this->getImage($favicon, true);
+                return $this->getImage($url, $favicon, true);
             case FaviconDLType::HOTLINK_URL:
             default:
-                return $favicon;
+                return empty($favicon) ? false : $favicon;
         }
     }
     
@@ -204,9 +206,13 @@ class Favicon
     /**
      * Find remote favicon and return it as an image
      */
-    private function getImage($faviconUrl = '', $image = false)
+    private function getImage($url, $faviconUrl = '', $image = false)
     {
-        $favicon = $this->checkCache($faviconUrl);
+        if (empty($faviconUrl)) {
+            return false;
+        }
+
+        $favicon = $this->checkCache($url, self::$TYPE_CACHE_IMG);
         // Favicon not found in the cache
         if( $favicon === false ) {
             $favicon = $this->dataAccess->retrieveUrl($faviconUrl);
@@ -214,7 +220,7 @@ class Favicon
             if (!$this->checkImageMTypeContent($favicon)) {
                 return false;
             } else {
-                $this->saveCache($faviconUrl, $favicon);
+                $this->saveCache($url, $favicon, self::$TYPE_CACHE_IMG);
             }
         }
 
@@ -222,7 +228,7 @@ class Favicon
             return $favicon;
         }
         else
-            return md5($faviconUrl);
+            return self::$TYPE_CACHE_IMG . md5($url);
     }
 
     /**
@@ -265,10 +271,12 @@ class Favicon
         return false;
     }
 
-    private function checkCache($url) {
+    private function checkCache($url, $type) {
         if ($this->cacheTimeout) {
-            $cache = $this->cacheDir . '/' . md5($url);
-            if (file_exists($cache) && is_readable($cache) && (time() - filemtime($cache) < $this->cacheTimeout)) {
+            $cache = $this->cacheDir . '/'. $type . md5($url);
+            if (file_exists($cache) && is_readable($cache)
+                && ($this->cacheTimeout === -1 || time() - filemtime($cache) < $this->cacheTimeout)
+            ) {
                 return $this->dataAccess->readCache($cache);
             }
         }
@@ -279,12 +287,15 @@ class Favicon
      * Will save data in cacheDir if the directory writable and any previous cache is expired (cacheTimeout)
      * @param $url
      * @param $data
+     * @param $type
      * @return string cache file path
      */
-    private function saveCache($url, $data) {
+    private function saveCache($url, $data, $type) {
         // Save cache if necessary
-        $cache = $this->cacheDir . '/' . md5($url);
-        if ($this->cacheTimeout && !file_exists($cache) || (is_writable($cache) && time() - filemtime($cache) > $this->cacheTimeout)) {
+        $cache = $this->cacheDir . '/'. $type . md5($url);
+        if ($this->cacheTimeout && !file_exists($cache)
+            || (is_writable($cache) && $this->cacheTimeout !== -1 && time() - filemtime($cache) > $this->cacheTimeout)
+        ) {
             $this->dataAccess->saveCache($cache, $data);
         }
         return $cache;
