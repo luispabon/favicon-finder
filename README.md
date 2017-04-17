@@ -6,15 +6,16 @@ This library is based on [Chris Shiflett work](https://github.com/shiflett/favic
 Here are the changes you can see in this version:
 
   * Cover more use case to find favicons
-  * Various technical changes and improvements
   * Composer support
+  * Various technical changes and improvements
   * Unit tests
-  * Not found favicon now return false (default action isn't this lib responsability)
 
 Requirements
 ------------
 
-- [PHP] (http://php.net/)
+- [PHP 5.3](http://php.net/)
+- [php-xml](http://php.net/manual/fr/refs.xml.php) extension: parse HTML content
+- [php-fileinfo](http://php.net/manual/fr/book.fileinfo.php) extension: check image type
 
 Composer
 -----
@@ -22,20 +23,61 @@ Composer
 Use [Composer](https://getcomposer.org) by adding the following lines in your `composer.json`:
 
     "require": {
-        "arthurhoaro/favicon": "dev-master"
-    },
+        "arthurhoaro/favicon": "~1.0"
+    }
 
-Usage
+Basic Usage
 -----
 
-    <?php
+```php
+require_once('vendor/autoload.php');
 
-    require_once('vendor/autoload.php');
+$favicon = new \Favicon\Favicon();
 
-    $favicon = new \Favicon\Favicon();
+echo $favicon->get('http://hoa.ro');
+// Displays: http://hoa.ro/themes/hoaro/img/favicon.png
+var_dump($favicon->get('http://nofavicon.tld', FaviconDLType::HOTLINK_URL));
+// Returns false
+```
 
-    echo $favicon->get('http://hoa.ro');
-    // Displays: http://hoa.ro/themes/hoaro/img/favicon.png
-    var_dump($favicon->get('http://nofavicon.tld'));
-    // Returns false
+You can avoid hotlinking by downloading the favicons:
+
+```php
+$favicon = new \Favicon\Favicon();
+
+// return the absolute path of the cached favicon
+$favicon->getImage('http://hoa.ro', FaviconDLType::DL_FILE_PATH);
+// Or the default favicon path
+$favicon->getImage('http://nofavicon.tld');
+```
     
+Or directly get the raw image as a binary string:
+
+```php
+$favicon = new \Favicon\Favicon();
+
+// return the binary string of the downloaded favicon
+$favicon->getImage('http://hoa.ro', FaviconDLType::RAW_IMAGE);
+// Or the default favicon file content
+$favicon->getImage('http://nofavicon.tld');
+```
+
+> Note: `DL_FILE_PATH` and `RAW_IMAGE` require the cache to be enabled.
+
+Configure
+-----
+
+You can setup cache settings:
+
+```php
+$favicon = new Favicon();
+$settings = array(
+    // Cache directory
+    'dir' => '/tmp/',
+    // Cache timeout in seconds
+    'timeout' => 86400,
+    // Default image when no favicon is found
+    'defaultico' => 'img/fav.ico'
+);
+$favicon->cache($settings);
+```
