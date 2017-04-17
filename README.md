@@ -46,9 +46,9 @@ You can avoid hotlinking by downloading the favicons:
 $favicon = new \Favicon\Favicon();
 
 // return the generated filename inside the cache folder
-$favicon->getImage('http://hoa.ro', FaviconDLType::DL_FILE_PATH);
+$favicon->get('http://hoa.ro', FaviconDLType::DL_FILE_PATH);
 // return false
-$favicon->getImage('http://nofavicon.tld');
+$favicon->get('http://nofavicon.tld');
 ```
     
 Or directly get the raw image as a binary string:
@@ -57,9 +57,9 @@ Or directly get the raw image as a binary string:
 $favicon = new \Favicon\Favicon();
 
 // return the binary string of the downloaded favicon
-$favicon->getImage('http://hoa.ro', FaviconDLType::RAW_IMAGE);
+$favicon->get('http://hoa.ro', FaviconDLType::RAW_IMAGE);
 // return false
-$favicon->getImage('http://nofavicon.tld');
+$favicon->get('http://nofavicon.tld');
 ```
 
 > Note: `DL_FILE_PATH` and `RAW_IMAGE` require the cache to be enabled.
