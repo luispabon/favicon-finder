@@ -185,7 +185,10 @@ class Favicon
 
         // See if it's specified in a link tag in domain url.
         if (!$favicon) {
-            $favicon = $this->getInPage($url);
+            $favicon = trim($this->getInPage($url));
+        }
+        if (substr($favicon, 0, 2) === '//') {
+            $favicon = 'https:' . $favicon;
         }
         
         // Make sure the favicon is an absolute URL.
