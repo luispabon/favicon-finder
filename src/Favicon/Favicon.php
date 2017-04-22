@@ -261,9 +261,15 @@ class Favicon
             foreach ($links as $link) {
                 if ($link->hasAttribute('rel') && strtolower($link->getAttribute('rel')) == 'shortcut icon') {
                     return $link->getAttribute('href');
-                } elseif ($link->hasAttribute('rel') && strtolower($link->getAttribute('rel')) == 'icon') {
+                }
+			}
+			foreach ($links as $link) {
+				if ($link->hasAttribute('rel') && strtolower($link->getAttribute('rel')) == 'icon') {
                     return $link->getAttribute('href');
-                } elseif ($link->hasAttribute('href') && strpos($link->getAttribute('href'), 'favicon') !== FALSE) {
+                }
+			}
+			foreach ($links as $link) {
+				if ($link->hasAttribute('href') && strpos($link->getAttribute('href'), 'favicon') !== FALSE) {
                     return $link->getAttribute('href');
                 }
             }
