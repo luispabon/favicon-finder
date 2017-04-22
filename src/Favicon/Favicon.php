@@ -319,7 +319,8 @@ class Favicon
             $fInfo = finfo_open(FILEINFO_MIME_TYPE);
             $isImage = strpos(finfo_buffer($fInfo, $content), 'image') !== false;
             finfo_close($fInfo);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
+            error_log('Favicon checkImageMTypeContent error: ' . $e->getMessage());
         }
 
         return $isImage;
