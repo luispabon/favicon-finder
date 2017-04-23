@@ -7,8 +7,8 @@ class FaviconTest extends \PHPUnit_Framework_TestCase {
     const TEST_LOGO_NAME = 'default.ico';
     private $RESOURCE_FAV_ICO;
     private $CACHE_TEST_DIR;
-    const SANDBOX = '../sandbox';
-    const RESOURCES = '../resources';
+    const SANDBOX = 'tests/sandbox';
+    const RESOURCES = 'tests/resources';
 
     public function setUp() {
         directory_create(self::SANDBOX, 0775);
