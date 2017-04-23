@@ -171,10 +171,11 @@ class FaviconTest extends \PHPUnit_Framework_TestCase {
         
         // Data
         $urlRedirect = 'http://redirected.domain.tld';
+        $urlRedirect2 = 'http://redirected.domain.tld2';
         $url = 'http://domain.tld';
         $headerRedirect = array(
             0 => 'HTTP/1.0 302 Found',
-            'Location' => $urlRedirect,
+            'location' => $urlRedirect,
         );
         $headerOk = array(0 => 'HTTP/1.1 200 OK');
         
@@ -185,12 +186,35 @@ class FaviconTest extends \PHPUnit_Framework_TestCase {
         $res = $fav->info($url);
         $this->assertEquals($urlRedirect, $res['url']);
         $this->assertEquals('200', $res['status']);
-        
+
+        // Redirect array
+        $headerRedirect['location'] = array($urlRedirect, $urlRedirect2);
+        $dataAccess->expects($this->at(0))->method('retrieveHeader')->will($this->returnValue($headerRedirect));
+        $dataAccess->expects($this->at(1))->method('retrieveHeader')->will($this->returnValue($headerOk));
+        $res = $fav->info($url);
+        $this->assertEquals($urlRedirect2, $res['url']);
+        $this->assertEquals('200', $res['status']);
+
         // Redirect loop
         $dataAccess->expects($this->exactly(5))->method('retrieveHeader')->will($this->returnValue($headerRedirect));
         $res = $fav->info($url);
-        $this->assertEquals($urlRedirect, $res['url']);
+        $this->assertEquals($urlRedirect2, $res['url']);
         $this->assertEquals('302', $res['status']);
+    }
+
+    /**
+     * @covers Favicon::info
+     * @uses Favicon
+     */
+    public function testInfoFalse()
+    {
+        $dataAccess = $this->getMock('Favicon\DataAccess');
+        $fav = new Favicon();
+        $fav->setDataAccess($dataAccess);
+        $url = 'http://domain.tld';
+
+        $dataAccess->expects($this->at(0))->method('retrieveHeader')->will($this->returnValue(null));
+        $this->assertFalse($fav->info($url));
     }
     
     /**
