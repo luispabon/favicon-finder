@@ -187,8 +187,13 @@ class Favicon
         if (!$favicon) {
             $favicon = trim($this->getInPage($url));
         }
+        // Case of protocol-relative URLs
         if (substr($favicon, 0, 2) === '//') {
-            $favicon = 'https:' . $favicon;
+            if (preg_match('%^(https?:)//%i', $url, $matches)) {
+                $favicon = $matches[1] . $favicon;
+            } else {
+                $favicon = 'https:' . $favicon;
+            }
         }
         
         // Make sure the favicon is an absolute URL.
