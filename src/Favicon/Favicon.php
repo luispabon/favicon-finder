@@ -204,7 +204,7 @@ class Favicon
         
         // Make sure the favicon is an absolute URL.
         if( $favicon && filter_var($favicon, FILTER_VALIDATE_URL) === false ) {
-            $favicon = $url . '/' . $favicon;
+            $favicon = rtrim($url, '/') . '/' . ltrim($favicon, '/');
         }
 
         // Sometimes people lie, so check the status.
