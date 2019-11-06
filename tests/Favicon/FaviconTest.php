@@ -22,23 +22,23 @@ class FaviconTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-    * @covers Favicon::__construct
-    * @uses Favicon
+    * @covers FaviconOld::__construct
+    * @uses   FaviconOld
     */
     public function testUrlIsDefinedByConstructor() {
         $url = 'http://foo.bar';
         $args = array( 'url' => $url );
-        $fav = new Favicon( $args );
+        $fav = new FaviconOld( $args );
         $this->assertEquals($url, $fav->getUrl());
     }
     
     /**
-    * @covers Favicon::__construct
-    * @covers Favicon::cache
-    * @uses Favicon
+    * @covers FaviconOld::__construct
+    * @covers FaviconOld::cache
+    * @uses   FaviconOld
     */
     public function testInitEmptyCache() {
-    	$fav = new Favicon();
+    	$fav = new FaviconOld();
     	$fav->cache();
     	
     	$this->assertTrue(is_writable($fav->getCacheDir()));
@@ -46,14 +46,14 @@ class FaviconTest extends \PHPUnit_Framework_TestCase {
     }
     
     /**
-    * @covers Favicon::__construct
-    * @covers Favicon::cache
-    * @uses Favicon
+    * @covers FaviconOld::__construct
+    * @covers FaviconOld::cache
+    * @uses   FaviconOld
     */
     public function testInitNotWritableCache() {
     	$dir = '/f0o/b@r';
     	
-    	$fav = new Favicon();
+    	$fav = new FaviconOld();
     	$params = array(
     		'dir' => $dir,
     		);
@@ -65,14 +65,14 @@ class FaviconTest extends \PHPUnit_Framework_TestCase {
     }
     
     /**
-    * @covers Favicon::__construct
-    * @covers Favicon::cache
-    * @uses Favicon
+    * @covers FaviconOld::__construct
+    * @covers FaviconOld::cache
+    * @uses   FaviconOld
     */
     public function testInitWritableCacheAndTimeout() {
     	$timeout = 1000;
     	
-    	$fav = new Favicon();
+    	$fav = new FaviconOld();
     	$params = array(
     		'dir' => $this->CACHE_TEST_DIR,
     		'timeout' => $timeout,
@@ -85,11 +85,11 @@ class FaviconTest extends \PHPUnit_Framework_TestCase {
     }
     
     /**
-    * @covers Favicon::baseUrl
-    * @uses Favicon
+    * @covers FaviconOld::baseUrl
+    * @uses   FaviconOld
     */
     public function testBaseFalseUrl() {
-    	$fav = new Favicon();
+    	$fav = new FaviconOld();
     	
     	$notAnUrl = 'fgkljkdf';
     	$notPrefixedUrl = 'domain.tld';
@@ -105,11 +105,11 @@ class FaviconTest extends \PHPUnit_Framework_TestCase {
     }
     
     /**
-    * @covers Favicon::baseUrl
-    * @uses Favicon
+    * @covers FaviconOld::baseUrl
+    * @uses   FaviconOld
     */
     public function testBaseUrlValid() {
-    	$fav = new Favicon();
+    	$fav = new FaviconOld();
     	
     	$simpleUrl = 'http://domain.tld';
     	$simpleHttpsUrl = 'https://domain.tld';
@@ -132,20 +132,20 @@ class FaviconTest extends \PHPUnit_Framework_TestCase {
     }
     
     /**
-    * @covers Favicon::info
-    * @uses Favicon
+    * @covers FaviconOld::info
+    * @uses   FaviconOld
     */
     public function testBlankInfo() {
-        $fav = new Favicon();
+        $fav = new FaviconOld();
         $this->assertFalse($fav->info(''));
     }
     
     /**
-    * @covers Favicon::info
-    * @uses Favicon
+    * @covers FaviconOld::info
+    * @uses   FaviconOld
     */
     public function testInfoOk() {
-        $fav = new Favicon();
+        $fav = new FaviconOld();
         $dataAccess = $this->getMock('Favicon\DataAccess');
         $header = array(
             0 => 'HTTP/1.1 200 OK',
@@ -161,12 +161,12 @@ class FaviconTest extends \PHPUnit_Framework_TestCase {
     }
     
     /**
-    * @covers Favicon::info
-    * @uses Favicon
+    * @covers FaviconOld::info
+    * @uses   FaviconOld
     */
     public function testInfoRedirect() {
         $dataAccess = $this->getMock('Favicon\DataAccess');
-        $fav = new Favicon();
+        $fav = new FaviconOld();
         $fav->setDataAccess($dataAccess);
         
         // Data
@@ -203,13 +203,13 @@ class FaviconTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers Favicon::info
-     * @uses Favicon
+     * @covers FaviconOld::info
+     * @uses   FaviconOld
      */
     public function testInfoFalse()
     {
         $dataAccess = $this->getMock('Favicon\DataAccess');
-        $fav = new Favicon();
+        $fav = new FaviconOld();
         $fav->setDataAccess($dataAccess);
         $url = 'http://domain.tld';
 
@@ -218,14 +218,14 @@ class FaviconTest extends \PHPUnit_Framework_TestCase {
     }
     
     /**
-    * @covers Favicon::get
-    * @uses Favicon
+    * @covers FaviconOld::get
+    * @uses   FaviconOld
     */
     public function testGetExistingFavicon() {
         $url = 'http://domain.tld/';
         $path = 'sub/';
         
-        $fav = new Favicon(array('url' => $url . $path));
+        $fav = new FaviconOld(array('url' => $url . $path));
         
         // No cache
         $fav->cache(array('dir' => $this->CACHE_TEST_DIR));
@@ -242,13 +242,13 @@ class FaviconTest extends \PHPUnit_Framework_TestCase {
     }
     
     /**
-    * @covers Favicon::get
-    * @uses Favicon
+    * @covers FaviconOld::get
+    * @uses   FaviconOld
     */
     public function testGetOriginalFavicon() {
         $url = 'http://domain.tld/original';
         $logo = 'default.ico';
-        $fav = new Favicon(array('url' => $url));
+        $fav = new FaviconOld(array('url' => $url));
         
         // No cache
         $fav->cache(array('dir' => $this->CACHE_TEST_DIR));
@@ -265,12 +265,12 @@ class FaviconTest extends \PHPUnit_Framework_TestCase {
     }
     
     /**
-    * @covers Favicon::get
-    * @uses Favicon
+    * @covers FaviconOld::get
+    * @uses   FaviconOld
     */
     public function testGetDefaultFavicon() {
         $url = 'http://domain.tld/';
-        $fav = new Favicon(array('url' => $url));
+        $fav = new FaviconOld(array('url' => $url));
         
         // No cache
         $fav->cache(array('dir' => $this->CACHE_TEST_DIR));
@@ -286,12 +286,12 @@ class FaviconTest extends \PHPUnit_Framework_TestCase {
     }
     
     /**
-    * @covers Favicon::get
-    * @uses Favicon
+    * @covers FaviconOld::get
+    * @uses   FaviconOld
     */
     public function testGetCachedFavicon() {
         $url = 'http://domaincache.tld/';
-        $fav = new Favicon(array('url' => $url));
+        $fav = new FaviconOld(array('url' => $url));
         
         // 30s
         $fav->cache(array('timeout' => 30, 'dir' => $this->CACHE_TEST_DIR));
@@ -306,7 +306,7 @@ class FaviconTest extends \PHPUnit_Framework_TestCase {
         // Save default favicon in cache
         $fav->get();
         
-        $fav = new Favicon(array('url' => $url));
+        $fav = new FaviconOld(array('url' => $url));
         $fav->cache(array('timeout' => 30, 'dir' => $this->CACHE_TEST_DIR));
         $dataAccess = $this->getMock('Favicon\DataAccess', array('retrieveHeader', 'retrieveUrl'));
         $fav->setDataAccess($dataAccess);
@@ -317,21 +317,21 @@ class FaviconTest extends \PHPUnit_Framework_TestCase {
     }
     
     /**
-    * @covers Favicon::get
-    * @uses Favicon
+    * @covers FaviconOld::get
+    * @uses   FaviconOld
     */
     public function testGetFaviconEmptyUrl() {
-    	$fav = new Favicon();
+    	$fav = new FaviconOld();
     	$this->assertFalse($fav->get());
     }
     
     /**
-    * @covers Favicon::get
-    * @uses Favicon
+    * @covers FaviconOld::get
+    * @uses   FaviconOld
     */
     public function testGetNotFoundFavicon() {
     	$url = 'http://domain.tld';
-        $fav = new Favicon(array('url' => $url));
+        $fav = new FaviconOld(array('url' => $url));
         // No cache
         $fav->cache(array('dir' => $this->CACHE_TEST_DIR));
         
@@ -344,12 +344,12 @@ class FaviconTest extends \PHPUnit_Framework_TestCase {
     }
     
     /**
-    * @covers Favicon::get
-    * @uses Favicon
+    * @covers FaviconOld::get
+    * @uses   FaviconOld
     */
     public function testGetFalsePositive() {
     	$url = 'http://domain.tld';
-        $fav = new Favicon(array('url' => $url));
+        $fav = new FaviconOld(array('url' => $url));
         // No cache
         $fav->cache(array('dir' => $this->CACHE_TEST_DIR));
         
@@ -362,12 +362,12 @@ class FaviconTest extends \PHPUnit_Framework_TestCase {
     }
     
     /**
-    * @covers Favicon::get
-    * @uses Favicon
+    * @covers FaviconOld::get
+    * @uses   FaviconOld
     */
     public function testGetNoHtmlHeader() {
     	$url = 'http://domain.tld/original';
-        $fav = new Favicon(array('url' => $url));
+        $fav = new FaviconOld(array('url' => $url));
         
         // No cache
         $fav->cache(array('dir' => $this->CACHE_TEST_DIR));
@@ -383,12 +383,12 @@ class FaviconTest extends \PHPUnit_Framework_TestCase {
     }
     
     /**
-    * @covers Favicon::get
-    * @uses Favicon
+    * @covers FaviconOld::get
+    * @uses   FaviconOld
     */
     public function testGetValidFavNoCacheSetup() {
     	$url = 'http://domain.tld';
-        $fav = new Favicon(array('url' => $url));
+        $fav = new FaviconOld(array('url' => $url));
         
         $dataAccess = $this->getMock('Favicon\DataAccess', array('retrieveHeader', 'retrieveUrl'));
         $fav->setDataAccess($dataAccess);
@@ -405,7 +405,7 @@ class FaviconTest extends \PHPUnit_Framework_TestCase {
     public function testGetDownloadedFavPath()
     {
         $url = 'http://domain.tld';
-        $fav = new Favicon(array('url' => $url));
+        $fav = new FaviconOld(array('url' => $url));
         $fav->cache(array(
             'dir' => $this->CACHE_TEST_DIR
         ));
@@ -424,7 +424,7 @@ class FaviconTest extends \PHPUnit_Framework_TestCase {
     public function testGetRawImageFav()
     {
         $url = 'http://domain.tld';
-        $fav = new Favicon(array('url' => $url));
+        $fav = new FaviconOld(array('url' => $url));
         $fav->cache(array(
             'dir' => $this->CACHE_TEST_DIR
         ));
