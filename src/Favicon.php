@@ -42,7 +42,8 @@ class Favicon
     public function get(string $url): ?string
     {
         $baseUrl = $this->getBaseUrl($url);
-        $favicon = $this->cache->get($baseUrl);
+        $cacheKey = md5($baseUrl);
+        $favicon = $this->cache->get($cacheKey);
 
         if ($favicon === null) {
             // Try default icon first
@@ -54,7 +55,7 @@ class Favicon
             }
 
             if ($favicon !== null) {
-                $this->cache->set($baseUrl, $favicon, $this->cacheTtl);
+                $this->cache->set($cacheKey, $favicon, $this->cacheTtl);
             }
         }
 
