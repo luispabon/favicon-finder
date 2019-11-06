@@ -5,6 +5,7 @@ namespace Favicon;
 use DOMDocument;
 use DOMNode;
 use Favicon\Exception\MalformedUrlException;
+use Favicon\Exception\NoHostUrlException;
 use Favicon\Exception\UnsupportedUrlSchemeException;
 use GuzzleHttp\ClientInterface;
 use Psr\SimpleCache\CacheInterface;
@@ -34,6 +35,9 @@ class Favicon
     /**
      * Retrieve the best favicon available at the given URL and return as a URL to the resource.
      *
+     * Cache any found favicons on the given cache pool when cache ain't hit only, to allow favicons to renew
+     * eventually if the source changed.
+     *
      * @param string $url
      *
      * @return string|null
@@ -41,9 +45,9 @@ class Favicon
      */
     public function get(string $url): ?string
     {
-        $baseUrl = $this->getBaseUrl($url);
+        $baseUrl  = $this->getBaseUrl($url);
         $cacheKey = md5($baseUrl);
-        $favicon = $this->cache->get($cacheKey);
+        $favicon  = $this->cache->get($cacheKey);
 
         if ($favicon === null) {
             // Try default icon first
@@ -167,8 +171,9 @@ class Favicon
             throw new MalformedUrlException($url);
         }
 
-        if ($parsed === false) {
-            throw new MalformedUrlException($url);
+        $host = $parsed['host'] ?? null;
+        if ($host === null) {
+            throw new NoHostUrlException($url);
         }
 
         $scheme = strtolower($parsed['scheme'] ?? '');
@@ -186,12 +191,9 @@ class Favicon
             );
         }
 
-        // parse_url will fail if there's no host
-        $host = $parsed['host'];
-
         $port = $parsed['port'] ?? '';
         if ($port !== '') {
-            $port = sprintf('%s:', $port);
+            $port = sprintf(':%s', $port);
         }
 
         return sprintf('%s://%s%s%s', $scheme, $userPass, $host, $port);
