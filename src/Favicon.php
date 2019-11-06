@@ -75,7 +75,7 @@ class Favicon
 
         try {
             $response = $this->guzzle->request('HEAD', $defaultFavicon, self::GUZZLE_OPTIONS);
-            if ($response->getStatusCode() >= 200 && $response <= 299) {
+            if ($response->getStatusCode() >= 200 && $response->getStatusCode() <= 299) {
                 return $defaultFavicon;
             }
         } catch (Throwable $ex) {
