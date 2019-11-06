@@ -6,3 +6,6 @@ index.php
 ### Composer ###
 composer.phar
 vendor/
+
+reports
+.phpunit.result.cache
