@@ -38,7 +38,8 @@
     "symfony/var-dumper": "^4.3",
     "phpunit/phpunit": "^8.4",
     "guzzlehttp/psr7": "^1.6",
-    "infection/infection": "^0.14.2"
+    "infection/infection": "^0.14.2",
+    "phpstan/phpstan": "^0.11.19"
   },
   "autoload": {
     "psr-4": {
