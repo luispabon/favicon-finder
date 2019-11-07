@@ -104,33 +104,9 @@ class FaviconTest extends TestCase
         self::assertSame($expectedFavicon, $this->instance->get($url));
     }
 
-    public function htmlFixturesDataProvider(): array
-    {
-        return [
-            'rel icon' => [
-                'url'           => 'https://foobar/',
-                'base url'      => 'https://foobar',
-                'html'          => file_get_contents(self::FIXTURES_FOLDER . '/rel_icon.html'),
-                'expected icon' => 'https://foobar/d00d.png',
-            ],
-            'rel shortcut icon' => [
-                'url'           => 'https://bungo/foo/bar',
-                'base url'      => 'https://bungo',
-                'html'          => file_get_contents(self::FIXTURES_FOLDER . '/rel_shortcut_icon.html'),
-                'expected icon' => 'https://bungo/AWESOME_FAVICON.png',
-            ],
-            'href favicon' => [
-                'url'           => 'https://dodgy/foo?bar',
-                'base url'      => 'https://dodgy',
-                'html'          => file_get_contents(self::FIXTURES_FOLDER . '/href_favicon.html'),
-                'expected icon' => 'https://dodgy/favicon_yeah.png',
-            ],
-        ];
-    }
-
     /**
      * @test
-     * @dataProvider htmlFixturesDataProvider
+     * @dataProvider htmlSuccessFixturesDataProvider
      */
     public function successInPageIconAfterNotFound(
         string $url,
@@ -181,44 +157,68 @@ class FaviconTest extends TestCase
     {
         return [
             'simple url'              => [
-                'url'             => 'http://domain.tld',
-                'base_url'        => 'http://domain.tld',
-                '$success status' => 200,
+                'url'            => 'http://domain.tld',
+                'base url'       => 'http://domain.tld',
+                'success status' => 200,
             ],
             'simple https url'        => [
-                'url'             => 'https://domain.tld',
-                'base_url'        => 'https://domain.tld',
-                '$success status' => 201, // You never know what crappy servers might be out there
+                'url'            => 'https://domain.tld',
+                'base url'       => 'https://domain.tld',
+                'success status' => 201, // You never know what crappy servers might be out there
             ],
             'url with trailing slash' => [
-                'url'             => 'http://domain.tld/',
-                'base_url'        => 'http://domain.tld',
-                '$success status' => 202,
+                'url'            => 'http://domain.tld/',
+                'base url'       => 'http://domain.tld',
+                'success status' => 202,
             ],
             'url with port'           => [
-                'url'             => 'http://domain.tld:8080',
-                'base_url'        => 'http://domain.tld:8080',
-                '$success status' => 203,
+                'url'            => 'http://domain.tld:8080',
+                'base url'       => 'http://domain.tld:8080',
+                'success status' => 203,
             ],
             'user without password'   => [
-                'url'             => 'http://user@domain.tld',
-                'base_url'        => 'http://user@domain.tld',
-                '$success status' => 204,
+                'url'            => 'http://user@domain.tld',
+                'base url'       => 'http://user@domain.tld',
+                'success status' => 204,
             ],
             'user password'           => [
-                'url'             => 'http://user:password@domain.tld',
-                'base_url'        => 'http://user:password@domain.tld',
-                '$success status' => 205,
+                'url'            => 'http://user:password@domain.tld',
+                'base url'       => 'http://user:password@domain.tld',
+                'success status' => 205,
             ],
             'url with unused info'    => [
-                'url'             => 'http://domain.tld/index.php?foo=bar&bar=foo#foobar',
-                'base_url'        => 'http://domain.tld',
-                '$success status' => 206,
+                'url'            => 'http://domain.tld/index.php?foo=bar&bar=foo#foobar',
+                'base url'       => 'http://domain.tld',
+                'success status' => 206,
             ],
             'url with path'           => [
-                'url'             => 'http://domain.tld/my/super/path',
-                'base_url'        => 'http://domain.tld',
-                '$success status' => 299,
+                'url'            => 'http://domain.tld/my/super/path',
+                'base url'       => 'http://domain.tld',
+                'success status' => 299,
+            ],
+        ];
+    }
+
+    public function htmlSuccessFixturesDataProvider(): array
+    {
+        return [
+            'rel icon'          => [
+                'url'           => 'https://foobar/',
+                'base url'      => 'https://foobar',
+                'html'          => file_get_contents(self::FIXTURES_FOLDER . '/rel_icon.html'),
+                'expected icon' => 'https://foobar/d00d.png',
+            ],
+            'rel shortcut icon' => [
+                'url'           => 'https://bungo/foo/bar',
+                'base url'      => 'https://bungo',
+                'html'          => file_get_contents(self::FIXTURES_FOLDER . '/rel_shortcut_icon.html'),
+                'expected icon' => 'https://bungo/AWESOME_FAVICON.png',
+            ],
+            'href favicon'      => [
+                'url'           => 'https://dodgy/foo?bar',
+                'base url'      => 'https://dodgy',
+                'html'          => file_get_contents(self::FIXTURES_FOLDER . '/href_favicon.html'),
+                'expected icon' => 'https://dodgy/favicon_yeah.png',
             ],
         ];
     }
