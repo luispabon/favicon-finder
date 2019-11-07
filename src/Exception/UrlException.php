@@ -1,8 +1,11 @@
 <?php
+declare(strict_types=1);
 
 namespace FaviconFinder\Exception;
 
-class UrlException extends \RuntimeException
+use RuntimeException;
+
+class UrlException extends RuntimeException
 {
 
 }

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace FaviconFinder;
 
@@ -12,6 +13,12 @@ use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException as SimpleCacheInvalidArgumentException;
 use Throwable;
 
+/**
+ * The favicon finder itself. It will attempt to figure out if a site has a default favicon (eg /favicon.ico) and,
+ * if not, it will access the homepage and try to parse a favicon out of it.
+ *
+ * @package FaviconFinder
+ */
 class Favicon
 {
     private const GUZZLE_OPTIONS = ['allow_redirects' => true];
