@@ -132,8 +132,6 @@ class Favicon
             return '';
         }
 
-        $response->getBody()->rewind();
-
         $html    = $response->getBody()->getContents();
         $matches = [];
 
