@@ -28,5 +28,5 @@ vendor/bin/infection --coverage=reports/infection --threads=2 -s --min-msi=60 --
 # Go back to initial working dir to allow outputs to function
 cd ${INITIAL_FOLDER}
 
-# Copy reports to output
-cp code/reports/* coverage-reports/ -Rf
+# Copy reports to output (only of output is defined)
+[ -d "coverage-reports"  ] && cp code/reports/* coverage-reports/ -Rf
