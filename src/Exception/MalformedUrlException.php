@@ -5,6 +5,9 @@ namespace FaviconFinder\Exception;
 
 use Throwable;
 
+/**
+ * @codeCoverageIgnore
+ */
 class MalformedUrlException extends UrlException
 {
     public function __construct(string $url, Throwable $previous = null)

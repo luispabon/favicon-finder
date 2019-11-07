@@ -5,6 +5,9 @@ namespace FaviconFinder\Exception;
 
 use Throwable;
 
+/**
+ * @codeCoverageIgnore
+ */
 class NoHostUrlException extends UrlException
 {
     public function __construct($url, Throwable $previous = null)
