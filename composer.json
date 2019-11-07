@@ -39,7 +39,8 @@
   "require-dev": {
     "weew/helpers-filesystem": "~1.0",
     "symfony/var-dumper": "^4.3",
-    "phpunit/phpunit": "^8.4"
+    "phpunit/phpunit": "^8.4",
+    "guzzlehttp/psr7": "^1.6"
   },
   "autoload": {
     "psr-4": {
