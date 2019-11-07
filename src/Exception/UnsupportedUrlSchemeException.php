@@ -5,6 +5,9 @@ namespace FaviconFinder\Exception;
 
 use Throwable;
 
+/**
+ * @codeCoverageIgnore
+ */
 class UnsupportedUrlSchemeException extends UrlException
 {
     public function __construct(string $url, ?string $scheme, Throwable $previous = null)

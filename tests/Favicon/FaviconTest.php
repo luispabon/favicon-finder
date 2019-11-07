@@ -2,7 +2,9 @@
 
 namespace Favicon;
 
-use FaviconFinder\Exception\UrlException;
+use FaviconFinder\Exception\MalformedUrlException;
+use FaviconFinder\Exception\NoHostUrlException;
+use FaviconFinder\Exception\UnsupportedUrlSchemeException;
 use FaviconFinder\Favicon;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ClientException;
@@ -49,9 +51,9 @@ class FaviconTest extends TestCase
      * @test
      * @dataProvider dodgyUrlsDataProvider
      */
-    public function dodgyUrlsAreFerretedOut(string $dodgyUrl): void
+    public function dodgyUrlsAreFerretedOut(string $dodgyUrl, string $expectedExceptionClass): void
     {
-        $this->expectException(UrlException::class);
+        $this->expectException($expectedExceptionClass);
         $this->instance->get($dodgyUrl);
     }
 
@@ -270,53 +272,65 @@ class FaviconTest extends TestCase
     public function dodgyUrlsDataProvider(): array
     {
         return [
-            'only path'      => ['asdasd'],
-            'invalid scheme' => ['s3://foo.com'],
-            'no host'        => ['http://'],
-            'empty url'      => [''],
+            'only path'      => [
+                'url'             => 'asdasd',
+                'exception class' => NoHostUrlException::class,
+            ],
+            'invalid scheme' => [
+                'url'             => 's3://foo.com',
+                'exception class' => UnsupportedUrlSchemeException::class,
+            ],
+            'no host'        => [
+                'url'             => 'http://',
+                'exception class' => MalformedUrlException::class,
+            ],
+            'empty url'      => [
+                'url'             => '',
+                'exception class' => NoHostUrlException::class,
+            ],
         ];
     }
 
     public function goodUrlsDataProvider(): array
     {
         return [
-            'simple url'              => [
+            'simple url'                         => [
                 'url'            => 'http://domain.tld',
                 'base url'       => 'http://domain.tld',
                 'success status' => 200,
             ],
-            'simple https url'        => [
+            'simple https url'                   => [
                 'url'            => 'https://domain.tld',
                 'base url'       => 'https://domain.tld',
                 'success status' => 201, // You never know what crappy servers might be out there
             ],
-            'url with trailing slash' => [
+            'url with trailing slash'            => [
                 'url'            => 'http://domain.tld/',
                 'base url'       => 'http://domain.tld',
                 'success status' => 202,
             ],
-            'url with port'           => [
+            'url with port'                      => [
                 'url'            => 'http://domain.tld:8080',
                 'base url'       => 'http://domain.tld:8080',
                 'success status' => 203,
             ],
-            'user without password'   => [
+            'user without password'              => [
                 'url'            => 'http://user@domain.tld',
                 'base url'       => 'http://user@domain.tld',
                 'success status' => 204,
             ],
-            'user password'           => [
+            'user password'                      => [
                 'url'            => 'http://user:password@domain.tld',
                 'base url'       => 'http://user:password@domain.tld',
                 'success status' => 205,
             ],
-            'url with unused info'    => [
+            'url with unused info'               => [
                 'url'            => 'http://domain.tld/index.php?foo=bar&bar=foo#foobar',
                 'base url'       => 'http://domain.tld',
                 'success status' => 206,
             ],
-            'url with path'           => [
-                'url'            => 'http://domain.tld/my/super/path',
+            'url with path and uppercase schema' => [
+                'url'            => 'HTTP://domain.tld/my/super/path',
                 'base url'       => 'http://domain.tld',
                 'success status' => 299,
             ],

@@ -5,6 +5,9 @@ namespace FaviconFinder\Exception;
 
 use RuntimeException;
 
+/**
+ * @codeCoverageIgnore
+ */
 class UrlException extends RuntimeException
 {
 

@@ -1,6 +1,6 @@
 # Favicon Finder
 
-Simple library to work out the favicon for a site, given an URL.
+Simple PHP library to work out the favicon for a site, given an URL.
 
 It currently supports finding the default favicon, if it exists on the host (eg `/favicon.ico`) as well as some basic 
 HTML parsing of the homepage to hunt for standard favicon tags. Does not support `apple` type icons or manifests, 
@@ -49,8 +49,8 @@ $favicon = new \FaviconFinder\Favicon($guzzle, $cache, $ttl);
 echo $favicon->get('https://github.com/luispabon/favicon-finder');
 
 // Displays: https://github.com/favicon.ico
-var_dump($favicon->get('http://nofavicon.tld', FaviconDLType::HOTLINK_URL));
-// Returns false
+var_dump($favicon->get('http://nofavicon.tld'));
+// Returns null
 ```
 
 ## Contributing
