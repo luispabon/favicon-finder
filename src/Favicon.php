@@ -74,8 +74,11 @@ class Favicon
         $defaultFavicon = sprintf('%s/favicon.ico', $baseUrl);
 
         try {
-            $response = $this->guzzle->request('HEAD', $defaultFavicon, self::GUZZLE_OPTIONS);
-            if ($response->getStatusCode() >= 200 && $response->getStatusCode() <= 299) {
+            $statusCode = $this->guzzle
+                ->request('HEAD', $defaultFavicon, self::GUZZLE_OPTIONS)
+                ->getStatusCode();
+
+            if ($statusCode >= 200 && $statusCode <= 299) {
                 return $defaultFavicon;
             }
         } catch (Throwable $ex) {

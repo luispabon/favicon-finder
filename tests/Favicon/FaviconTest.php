@@ -4,6 +4,7 @@ namespace Favicon;
 
 use Favicon\Exception\UrlException;
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\SimpleCache\CacheInterface;
@@ -73,6 +74,36 @@ class FaviconTest extends TestCase
         self::assertSame($expectedFavicon, $this->instance->get($url));
     }
 
+    /**
+     * @test
+     * @dataProvider goodUrlsDataProvider
+     */
+    public function successDefaultFaviconNoCache(string $url, string $expectedBaseUrl, int $statusCode): void
+    {
+        $expectedCacheKey = md5($expectedBaseUrl);
+        $expectedFavicon  = $expectedBaseUrl . '/favicon.ico';
+
+        $this->cacheMock
+            ->expects(self::once())
+            ->method('get')
+            ->with($expectedCacheKey)
+            ->willReturn(null);
+
+        $this->guzzleMock
+            ->expects(self::once())
+            ->method('request')
+            ->with('HEAD', $expectedFavicon)
+            ->willReturn(new Response($statusCode));
+
+        $this->cacheMock
+            ->expects(self::once())
+            ->method('set')
+            ->with($expectedCacheKey, $expectedFavicon, self::TTL);
+
+
+        self::assertSame($expectedFavicon, $this->instance->get($url));
+    }
+
     public function dodgyUrlsDataProvider(): array
     {
         return [
@@ -87,38 +118,45 @@ class FaviconTest extends TestCase
     {
         return [
             'simple url'              => [
-                'url'      => 'http://domain.tld',
-                'base_url' => 'http://domain.tld',
+                'url'            => 'http://domain.tld',
+                'base_url'       => 'http://domain.tld',
+                'success_status' => 200,
             ],
             'simple https url'        => [
-                'url'      => 'https://domain.tld',
-                'base_url' => 'https://domain.tld',
+                'url'            => 'https://domain.tld',
+                'base_url'       => 'https://domain.tld',
+                'success_status' => 201, // You never know what crappy servers might be out there
             ],
             'url with trailing slash' => [
-                'url'      => 'http://domain.tld/',
-                'base_url' => 'http://domain.tld',
+                'url'            => 'http://domain.tld/',
+                'base_url'       => 'http://domain.tld',
+                'success_status' => 202,
             ],
             'url with port'           => [
-                'url'      => 'http://domain.tld:8080',
-                'base_url' => 'http://domain.tld:8080',
+                'url'            => 'http://domain.tld:8080',
+                'base_url'       => 'http://domain.tld:8080',
+                'success_status' => 203,
             ],
             'user without password'   => [
-                'url'      => 'http://user@domain.tld',
-                'base_url' => 'http://user@domain.tld',
+                'url'            => 'http://user@domain.tld',
+                'base_url'       => 'http://user@domain.tld',
+                'success_status' => 204,
             ],
             'user password'           => [
-                'url'      => 'http://user:password@domain.tld',
-                'base_url' => 'http://user:password@domain.tld',
+                'url'            => 'http://user:password@domain.tld',
+                'base_url'       => 'http://user:password@domain.tld',
+                'success_status' => 205,
             ],
             'url with unused info'    => [
-                'url'      => 'http://domain.tld/index.php?foo=bar&bar=foo#foobar',
-                'base_url' => 'http://domain.tld',
+                'url'            => 'http://domain.tld/index.php?foo=bar&bar=foo#foobar',
+                'base_url'       => 'http://domain.tld',
+                'success_status' => 206,
             ],
             'url with path'           => [
-                'url'      => 'http://domain.tld/my/super/path',
-                'base_url' => 'http://domain.tld',
+                'url'            => 'http://domain.tld/my/super/path',
+                'base_url'       => 'http://domain.tld',
+                'success_status' => 299,
             ],
         ];
     }
-
 }
