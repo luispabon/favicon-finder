@@ -32,13 +32,13 @@ jobs:
         resource: master-status
         params: { state: "pending", commit: "code" }
 
-      - task: run tests php 7.1
-        file: code/concourse/task-run-tests-71.yaml
-
       - task: run tests php 7.2
         file: code/concourse/task-run-tests-72.yaml
 
       - task: run tests php 7.3
+        file: code/concourse/task-run-tests-73.yaml
+
+      - task: run tests php 7.4
         file: code/concourse/task-run-tests.yaml
 
         on_failure:
