@@ -133,7 +133,7 @@ class Favicon
         preg_match('!<head.*?>.*</head>!ims', $html, $matches);
 
         if (count($matches) === 0) {
-            return null;
+            return '';
         }
 
         $head = $matches[0];
