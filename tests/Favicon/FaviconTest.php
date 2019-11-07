@@ -4,6 +4,7 @@ namespace Favicon;
 
 use Favicon\Exception\UrlException;
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -128,6 +129,49 @@ class FaviconTest extends TestCase
             ->method('request')
             ->with('HEAD', $expectedDefaultFavicon)
             ->willReturn(new Response(404));
+
+        $this->guzzleMock
+            ->expects(self::at(1))
+            ->method('request')
+            ->with('GET', $expectedBaseUrl)
+            ->willReturn(new Response(200, [], $html));
+
+        $this->cacheMock
+            ->expects(self::once())
+            ->method('set')
+            ->with($expectedCacheKey, $expectedFavicon, self::TTL);
+
+        self::assertSame($expectedFavicon, $this->instance->get($url));
+    }
+
+    /**
+     * @test
+     * @dataProvider htmlSuccessFixturesDataProvider
+     */
+    public function successInPageIconAfterDefaultIconException(
+        string $url,
+        string $expectedBaseUrl,
+        string $html,
+        string $expectedFavicon
+    ): void {
+        $expectedCacheKey       = md5($expectedBaseUrl);
+        $expectedDefaultFavicon = $expectedBaseUrl . '/favicon.ico';
+
+        $exception = $this->getMockBuilder(ClientException::class)
+                          ->disableOriginalConstructor()
+                          ->getMock();
+
+        $this->cacheMock
+            ->expects(self::once())
+            ->method('get')
+            ->with($expectedCacheKey)
+            ->willReturn(null);
+
+        $this->guzzleMock
+            ->expects(self::at(0))
+            ->method('request')
+            ->with('HEAD', $expectedDefaultFavicon)
+            ->willThrowException($exception);
 
         $this->guzzleMock
             ->expects(self::at(1))
