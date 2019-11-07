@@ -28,7 +28,23 @@ jobs:
           path: code
           status: pending
 
-      - task: run tests
+      - task: run tests php 7.2
+        file: code/concourse/task-run-tests-72.yaml
+        on_failure:
+          put: code
+          params:
+            path: code
+            status: failure
+
+      - task: run tests php 7.3
+        file: code/concourse/task-run-tests-73.yaml
+        on_failure:
+          put: code
+          params:
+            path: code
+            status: failure
+
+      - task: run tests php 7.4
         file: code/concourse/task-run-tests.yaml
         on_failure:
           put: code
