@@ -29,4 +29,4 @@ vendor/bin/infection --coverage=reports/infection --threads=2 -s --min-msi=60 --
 cd ${INITIAL_FOLDER}
 
 # Copy reports to output (only of output is defined)
-[ -d "coverage-reports"  ] && cp code/reports/* coverage-reports/ -Rf
+[ -d "coverage-reports"  ] && cp code/reports/* coverage-reports/ -Rf || exit 0
