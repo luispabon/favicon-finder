@@ -228,6 +228,44 @@ class FaviconTest extends TestCase
         self::assertNull($this->instance->get($url));
     }
 
+    /**
+     * @test
+     */
+    public function exceptionThrownWhenFetchingPageIsHandled(): void
+    {
+        $url                    = 'http://foo';
+        $expectedCacheKey       = md5($url);
+        $expectedDefaultFavicon = $url . '/favicon.ico';
+
+        $exception = $this->getMockBuilder(ClientException::class)
+                          ->disableOriginalConstructor()
+                          ->getMock();
+
+        $this->cacheMock
+            ->expects(self::once())
+            ->method('get')
+            ->with($expectedCacheKey)
+            ->willReturn(null);
+
+        $this->guzzleMock
+            ->expects(self::at(0))
+            ->method('request')
+            ->with('HEAD', $expectedDefaultFavicon)
+            ->willReturn(new Response(404));
+
+        $this->guzzleMock
+            ->expects(self::at(1))
+            ->method('request')
+            ->with('GET', $url)
+            ->willThrowException($exception);
+
+        $this->cacheMock
+            ->expects(self::never())
+            ->method('set');
+
+        self::assertNull($this->instance->get($url));
+    }
+
     public function dodgyUrlsDataProvider(): array
     {
         return [
@@ -287,31 +325,31 @@ class FaviconTest extends TestCase
     public function htmlSuccessFixturesDataProvider(): array
     {
         return [
-            'rel icon'          => [
+            'rel icon'                         => [
                 'url'           => 'https://foobar/',
                 'base url'      => 'https://foobar',
                 'html'          => file_get_contents(self::FIXTURES_FOLDER . '/rel_icon.html'),
                 'expected icon' => 'https://foobar/d00d.png',
             ],
-            'rel shortcut icon' => [
+            'rel shortcut icon'                => [
                 'url'           => 'https://bungo/foo/bar',
                 'base url'      => 'https://bungo',
                 'html'          => file_get_contents(self::FIXTURES_FOLDER . '/rel_shortcut_icon.html'),
                 'expected icon' => 'https://bungo/AWESOME_FAVICON.png',
             ],
-            'href favicon'      => [
+            'href favicon'                     => [
                 'url'           => 'https://dodgy/foo?bar',
                 'base url'      => 'https://dodgy',
                 'html'          => file_get_contents(self::FIXTURES_FOLDER . '/href_favicon.html'),
                 'expected icon' => 'https://dodgy/favicon_yeah.png',
             ],
-            'protocol relative rel icon http'          => [
+            'protocol relative rel icon http'  => [
                 'url'           => 'http://foobar/',
                 'base url'      => 'http://foobar',
                 'html'          => file_get_contents(self::FIXTURES_FOLDER . '/proto_rel_icon.html'),
                 'expected icon' => 'http://foobar/foo/proto_rel.png',
             ],
-            'protocol relative rel icon https'          => [
+            'protocol relative rel icon https' => [
                 'url'           => 'https://foobar/',
                 'base url'      => 'https://foobar',
                 'html'          => file_get_contents(self::FIXTURES_FOLDER . '/proto_rel_icon.html'),
@@ -323,15 +361,15 @@ class FaviconTest extends TestCase
     public function htmlFailureFixturesDataProvider(): array
     {
         return [
-            'no icon'          => [
-                'url'           => 'https://foobar/',
-                'base url'      => 'https://foobar',
-                'html'          => file_get_contents(self::FIXTURES_FOLDER . '/no_icon.html'),
+            'no icon'           => [
+                'url'      => 'https://foobar/',
+                'base url' => 'https://foobar',
+                'html'     => file_get_contents(self::FIXTURES_FOLDER . '/no_icon.html'),
             ],
             'rel shortcut icon' => [
-                'url'           => 'https://bungo/foo/bar',
-                'base url'      => 'https://bungo',
-                'html'          => file_get_contents(self::FIXTURES_FOLDER . '/no_head.html'),
+                'url'      => 'https://bungo/foo/bar',
+                'base url' => 'https://bungo',
+                'html'     => file_get_contents(self::FIXTURES_FOLDER . '/no_head.html'),
             ],
         ];
     }
