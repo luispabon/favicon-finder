@@ -6,7 +6,7 @@ inputs:
 image_resource:
     type: docker-image
     source:
-        repository: phpdockerio/php73-cli
+        repository: phpdockerio/php72-cli
 
 caches:
     - path: code/vendor
