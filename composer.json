@@ -37,7 +37,8 @@
     "weew/helpers-filesystem": "~1.0",
     "symfony/var-dumper": "^4.3",
     "phpunit/phpunit": "^8.4",
-    "guzzlehttp/psr7": "^1.6"
+    "guzzlehttp/psr7": "^1.6",
+    "infection/infection": "^0.14.2"
   },
   "autoload": {
     "psr-4": {
