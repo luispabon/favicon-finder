@@ -11,7 +11,7 @@ mkdir reports
 
 # Install xdebug & disable
 apt-get update
-apt-get install -y php-xdebug
+apt-get install -y php-xdebug make
 phpdismod xdebug
 
 composer -o install
