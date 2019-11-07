@@ -5,6 +5,7 @@ index.php
 
 ### Composer ###
 composer.phar
+composer.lock
 vendor/
 
 reports
