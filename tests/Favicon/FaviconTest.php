@@ -2,7 +2,8 @@
 
 namespace Favicon;
 
-use Favicon\Exception\UrlException;
+use FaviconFinder\Exception\UrlException;
+use FaviconFinder\Favicon;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Response;

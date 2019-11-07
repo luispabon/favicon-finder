@@ -1,5 +1,5 @@
 {
-  "name": "luispabon/favicon",
+  "name": "luispabon/favicon-finder",
   "type": "library",
   "description": "PHP Library used to discover favicon from given URL",
   "keywords": [
@@ -23,15 +23,12 @@
       "homepage": "https://github.com/luispabon"
     }
   ],
-  "conflict": {
-
-  },
   "support": {
-    "issues": "https://github.com/luispabon/favicon/issues",
-    "sources": "https://github.com/luispabon/favicon"
+    "issues": "https://github.com/luispabon/favicon-finder/issues",
+    "sources": "https://github.com/luispabon/favicon-finder"
   },
   "require": {
-    "php":               ">=7.3.3",
+    "php":               ">=7.1.0",
     "ext-dom":           "*",
     "psr/simple-cache":  "^1.0",
     "guzzlehttp/guzzle": "^6.4"
@@ -44,7 +41,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Favicon\\": "src/"
+      "FaviconFinder\\": "src/"
     }
   }
 }

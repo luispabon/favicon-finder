@@ -1,12 +1,12 @@
 <?php
 
-namespace Favicon;
+namespace FaviconFinder;
 
 use DOMDocument;
 use DOMNode;
-use Favicon\Exception\MalformedUrlException;
-use Favicon\Exception\NoHostUrlException;
-use Favicon\Exception\UnsupportedUrlSchemeException;
+use FaviconFinder\Exception\MalformedUrlException;
+use FaviconFinder\Exception\NoHostUrlException;
+use FaviconFinder\Exception\UnsupportedUrlSchemeException;
 use GuzzleHttp\ClientInterface;
 use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException as SimpleCacheInvalidArgumentException;

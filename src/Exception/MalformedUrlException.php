@@ -1,6 +1,6 @@
 <?php
 
-namespace Favicon\Exception;
+namespace FaviconFinder\Exception;
 
 use Throwable;
 

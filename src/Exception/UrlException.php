@@ -1,6 +1,6 @@
 <?php
 
-namespace Favicon\Exception;
+namespace FaviconFinder\Exception;
 
 class UrlException extends \RuntimeException
 {
