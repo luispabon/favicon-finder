@@ -10,3 +10,4 @@ vendor/
 
 reports
 .phpunit.result.cache
+credentials.yaml
