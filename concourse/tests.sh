@@ -16,14 +16,8 @@ phpdismod xdebug
 
 composer -o install
 
-# Static analysis
-vendor/bin/phpstan -v analyse -l 1 src -c phpstan.neon  && printf "\n ${bold}PHPStan:${normal} static analysis good\n\n" || exit 1
-
-# Run unit tests
-php -d zend_extension=xdebug.so vendor/bin/phpunit --testdox
-
-# Run mutation tests
-vendor/bin/infection --coverage=reports/infection --threads=2 -s --min-msi=60 --min-covered-msi=60
+# Static analysis, unit tests
+make all
 
 # Go back to initial working dir to allow outputs to function
 cd ${INITIAL_FOLDER}
