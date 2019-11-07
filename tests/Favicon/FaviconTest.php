@@ -264,6 +264,18 @@ class FaviconTest extends TestCase
                 'html'          => file_get_contents(self::FIXTURES_FOLDER . '/href_favicon.html'),
                 'expected icon' => 'https://dodgy/favicon_yeah.png',
             ],
+            'protocol relative rel icon http'          => [
+                'url'           => 'http://foobar/',
+                'base url'      => 'http://foobar',
+                'html'          => file_get_contents(self::FIXTURES_FOLDER . '/proto_rel_icon.html'),
+                'expected icon' => 'http://foobar/foo/proto_rel.png',
+            ],
+            'protocol relative rel icon https'          => [
+                'url'           => 'https://foobar/',
+                'base url'      => 'https://foobar',
+                'html'          => file_get_contents(self::FIXTURES_FOLDER . '/proto_rel_icon.html'),
+                'expected icon' => 'https://foobar/foo/proto_rel.png',
+            ],
         ];
     }
 }
