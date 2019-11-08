@@ -20,6 +20,17 @@ class UrlTest extends TestCase
         new Url($dodgyUrl);
     }
 
+    /**
+     * @test
+     * @dataProvider goodUrlsDataProvider
+     */
+    public function goodUrlsAreParsedOutCorrectly(string $url, string $expectedBaseUrl, string $expectedScheme): void
+    {
+        $url = new Url($url);
+
+        self::assertSame($expectedBaseUrl, $url->getBaseUrl());
+        self::assertSame($expectedScheme, $url->getScheme());
+    }
 
     public function dodgyUrlsDataProvider(): array
     {
@@ -39,6 +50,52 @@ class UrlTest extends TestCase
             'empty url'      => [
                 'url'             => '',
                 'exception class' => NoHostUrlException::class,
+            ],
+        ];
+    }
+
+    public function goodUrlsDataProvider(): array
+    {
+        return [
+            'simple url'                         => [
+                'url'      => 'http://domain.tld',
+                'base url' => 'http://domain.tld',
+                'scheme'   => 'http',
+            ],
+            'simple https url'                   => [
+                'url'      => 'https://domain.tld',
+                'base url' => 'https://domain.tld',
+                'scheme'   => 'https',
+            ],
+            'url with trailing slash'            => [
+                'url'      => 'http://domain.tld/',
+                'base url' => 'http://domain.tld',
+                'scheme'   => 'http',
+            ],
+            'url with port'                      => [
+                'url'      => 'http://domain.tld:8080',
+                'base url' => 'http://domain.tld:8080',
+                'scheme'   => 'http',
+            ],
+            'user without password'              => [
+                'url'      => 'https://user@domain.tld',
+                'base url' => 'https://user@domain.tld',
+                'scheme'   => 'https',
+            ],
+            'user password'                      => [
+                'url'      => 'http://user:password@domain.tld',
+                'base url' => 'http://user:password@domain.tld',
+                'scheme'   => 'http',
+            ],
+            'url with unused info'               => [
+                'url'      => 'https://domain.tld/index.php?foo=bar&bar=foo#foobar',
+                'base url' => 'https://domain.tld',
+                'scheme'   => 'https',
+            ],
+            'url with path and uppercase schema' => [
+                'url'      => 'HTTP://domain.tld/my/super/path',
+                'base url' => 'http://domain.tld',
+                'scheme'   => 'http',
             ],
         ];
     }
