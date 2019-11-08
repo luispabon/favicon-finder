@@ -1,10 +1,7 @@
 <?php
+declare(strict_types=1);
 
-namespace Favicon;
-
-use FaviconFinder\Exception\MalformedUrlException;
-use FaviconFinder\Exception\NoHostUrlException;
-use FaviconFinder\Exception\UnsupportedUrlSchemeException;
+use FaviconFinder\Exception\UrlException;
 use FaviconFinder\Favicon;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ClientException;
@@ -51,9 +48,9 @@ class FaviconTest extends TestCase
      * @test
      * @dataProvider dodgyUrlsDataProvider
      */
-    public function dodgyUrlsAreFerretedOut(string $dodgyUrl, string $expectedExceptionClass): void
+    public function dodgyUrlsAreFerretedOut(string $dodgyUrl): void
     {
-        $this->expectException($expectedExceptionClass);
+        $this->expectException(UrlException::class);
         $this->instance->get($dodgyUrl);
     }
 
@@ -269,28 +266,6 @@ class FaviconTest extends TestCase
         self::assertNull($this->instance->get($url));
     }
 
-    public function dodgyUrlsDataProvider(): array
-    {
-        return [
-            'only path'      => [
-                'url'             => 'asdasd',
-                'exception class' => NoHostUrlException::class,
-            ],
-            'invalid scheme' => [
-                'url'             => 's3://foo.com',
-                'exception class' => UnsupportedUrlSchemeException::class,
-            ],
-            'no host'        => [
-                'url'             => 'http://',
-                'exception class' => MalformedUrlException::class,
-            ],
-            'empty url'      => [
-                'url'             => '',
-                'exception class' => NoHostUrlException::class,
-            ],
-        ];
-    }
-
     public function goodUrlsDataProvider(): array
     {
         return [
@@ -385,6 +360,24 @@ class FaviconTest extends TestCase
                 'url'      => 'https://bungo/foo/bar',
                 'base url' => 'https://bungo',
                 'html'     => file_get_contents(self::FIXTURES_FOLDER . '/no_head.html'),
+            ],
+        ];
+    }
+
+    public function dodgyUrlsDataProvider(): array
+    {
+        return [
+            'only path'      => [
+                'url' => 'asdasd',
+            ],
+            'invalid scheme' => [
+                'url' => 's3://foo.com',
+            ],
+            'no host'        => [
+                'url' => 'http://',
+            ],
+            'empty url'      => [
+                'url' => '',
             ],
         ];
     }
