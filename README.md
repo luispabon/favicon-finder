@@ -1,3 +1,6 @@
+[![Build status](https://ci.auronconsulting.co.uk/api/v1/teams/main/pipelines/favicon-finder-master/jobs/analyze-master/badge)](https://ci.auronconsulting.co.uk/teams/main/pipelines/favicon-finder-master)
+[![Code coverage](https://codecov.io/gh/luispabon/favicon-finder/branch/master/graph/badge.svg)](https://codecov.io/gh/luispabon/favicon-finder)
+
 # Favicon Finder
 
 Simple PHP library to work out the favicon for a site, given an URL.
