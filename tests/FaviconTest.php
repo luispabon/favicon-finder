@@ -1,10 +1,6 @@
 <?php
+declare(strict_types=1);
 
-namespace Favicon;
-
-use FaviconFinder\Exception\MalformedUrlException;
-use FaviconFinder\Exception\NoHostUrlException;
-use FaviconFinder\Exception\UnsupportedUrlSchemeException;
 use FaviconFinder\Favicon;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ClientException;
@@ -45,16 +41,6 @@ class FaviconTest extends TestCase
         $this->guzzleMock = null;
         $this->cacheMock  = null;
         $this->instance   = null;
-    }
-
-    /**
-     * @test
-     * @dataProvider dodgyUrlsDataProvider
-     */
-    public function dodgyUrlsAreFerretedOut(string $dodgyUrl, string $expectedExceptionClass): void
-    {
-        $this->expectException($expectedExceptionClass);
-        $this->instance->get($dodgyUrl);
     }
 
     /**
@@ -267,28 +253,6 @@ class FaviconTest extends TestCase
             ->method('set');
 
         self::assertNull($this->instance->get($url));
-    }
-
-    public function dodgyUrlsDataProvider(): array
-    {
-        return [
-            'only path'      => [
-                'url'             => 'asdasd',
-                'exception class' => NoHostUrlException::class,
-            ],
-            'invalid scheme' => [
-                'url'             => 's3://foo.com',
-                'exception class' => UnsupportedUrlSchemeException::class,
-            ],
-            'no host'        => [
-                'url'             => 'http://',
-                'exception class' => MalformedUrlException::class,
-            ],
-            'empty url'      => [
-                'url'             => '',
-                'exception class' => NoHostUrlException::class,
-            ],
-        ];
     }
 
     public function goodUrlsDataProvider(): array
