@@ -5,9 +5,6 @@ namespace FaviconFinder;
 
 use DOMDocument;
 use DOMNode;
-use FaviconFinder\Exception\MalformedUrlException;
-use FaviconFinder\Exception\NoHostUrlException;
-use FaviconFinder\Exception\UnsupportedUrlSchemeException;
 use GuzzleHttp\ClientInterface;
 use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException as SimpleCacheInvalidArgumentException;
@@ -21,7 +18,7 @@ use Throwable;
  */
 class Favicon
 {
-    private const GUZZLE_OPTIONS = ['allow_redirects' => true];
+    private const GUZZLE_OPTIONS    = ['allow_redirects' => true];
     private const DEFAULT_CACHE_TTL = 86400;
 
     /** @var ClientInterface */
@@ -53,17 +50,18 @@ class Favicon
      */
     public function get(string $url): ?string
     {
-        $baseUrl  = $this->getBaseUrl($url);
-        $cacheKey = md5($baseUrl);
-        $favicon  = $this->cache->get($cacheKey);
+        $parsedUrl = new Url($url);
+        $baseUrl   = $parsedUrl->getBaseUrl();
+        $cacheKey  = md5($baseUrl);
+        $favicon   = $this->cache->get($cacheKey);
 
         if ($favicon === null) {
             // Try default icon first
-            $favicon = $this->findDefaultIcon($baseUrl);
+            $favicon = $this->findDefaultIcon($parsedUrl);
 
             // Otherwise try parsing the homepage for it
             if ($favicon === null) {
-                $favicon = $this->findIconInPage($baseUrl);
+                $favicon = $this->findIconInPage($parsedUrl);
             }
 
             if ($favicon !== null) {
@@ -77,9 +75,9 @@ class Favicon
     /**
      * Checks whether the default icon (at /favicon.ico) is present, and if so, return its url.
      */
-    private function findDefaultIcon(string $baseUrl): ?string
+    private function findDefaultIcon(Url $url): ?string
     {
-        $defaultFavicon = sprintf('%s/favicon.ico', $baseUrl);
+        $defaultFavicon = sprintf('%s/favicon.ico', $url->getBaseUrl());
 
         try {
             $statusCode = $this->guzzle
@@ -99,9 +97,9 @@ class Favicon
     /**
      * Analyzes the html on the baseUrl for any icons and returns it, sanitising the URL.
      */
-    private function findIconInPage(string $baseUrl): ?string
+    private function findIconInPage(Url $url): ?string
     {
-        $favicon = $this->parseIconOffPage($baseUrl);
+        $favicon = $this->parseIconOffPage($url->getBaseUrl());
 
         if ($favicon === '') {
             return null;
@@ -109,14 +107,12 @@ class Favicon
 
         // Case of protocol-relative URLs
         if (strpos($favicon, '//') === 0) {
-            // We're relying here baseUrl has passed by $this->getBaseUrl, which ensures there's a scheme
-            $parsedBaseUrl = parse_url($baseUrl);
-            $favicon       = sprintf('%s:%s', $parsedBaseUrl['scheme'], $favicon);
+            $favicon = sprintf('%s:%s', $url->getScheme(), $favicon);
         }
 
         // Make sure the favicon is an absolute URL.
         if ($favicon && filter_var($favicon, FILTER_VALIDATE_URL) === false) {
-            $favicon = rtrim($baseUrl, '/') . '/' . ltrim($favicon, '/');
+            $favicon = rtrim($url->getBaseUrl(), '/') . '/' . ltrim($favicon, '/');
         }
 
         return $favicon;
@@ -162,43 +158,5 @@ class Favicon
         }
 
         return $favicon;
-    }
-
-    /**
-     * Given any HTTP/HTTPS url, return its base url (eg everything minus its path & query string).
-     */
-    private function getBaseUrl(string $url): string
-    {
-        $parsed = parse_url($url);
-        if ($parsed === false) {
-            throw new MalformedUrlException($url);
-        }
-
-        $host = $parsed['host'] ?? null;
-        if ($host === null) {
-            throw new NoHostUrlException($url);
-        }
-
-        $scheme = strtolower($parsed['scheme'] ?? '');
-        if ($scheme !== 'http' && $scheme !== 'https') {
-            throw new UnsupportedUrlSchemeException($url, $scheme);
-        }
-
-        // Username and password
-        $userPass = '';
-        if (isset($parsed['user']) === true) {
-            $userPass = sprintf(
-                '%s%s@',
-                $parsed['user'],
-                isset($parsed['pass']) ? ":{$parsed['pass']}" : ''
-            );
-        }
-
-        $port = $parsed['port'] ?? '';
-        if ($port !== '') {
-            $port = sprintf(':%s', $port);
-        }
-
-        return sprintf('%s://%s%s%s', $scheme, $userPass, $host, $port);
     }
 }
