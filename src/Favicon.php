@@ -51,10 +51,10 @@ class Favicon
     public function get(string $url): ?string
     {
         $parsedUrl = new Url($url);
-        $baseUrl   = $parsedUrl->getBaseUrl();
-        $cacheKey  = md5($baseUrl);
-        $favicon   = $this->cache->get($cacheKey);
+        $cacheKey  = md5($parsedUrl->getBaseUrl());
 
+        // Try and fetch from cache first
+        $favicon = $this->cache->get($cacheKey);
         if ($favicon === null) {
             // Try default icon first
             $favicon = $this->findDefaultIcon($parsedUrl);
