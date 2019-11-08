@@ -146,27 +146,21 @@ class Favicon
         $dom = new DOMDocument();
 
         // Use error suppression, because the HTML might be too malformed.
+        $favicon = '';
         if (@$dom->loadHTML($head)) {
             $links = $dom->getElementsByTagName('link');
             foreach ($links as $link) {
                 /** @var DOMNode $link */
-                if ($link->hasAttribute('rel') && strtolower($link->getAttribute('rel')) === 'shortcut icon') {
-                    return $link->getAttribute('href');
-                }
-            }
-            foreach ($links as $link) {
-                if ($link->hasAttribute('rel') && strtolower($link->getAttribute('rel')) === 'icon') {
-                    return $link->getAttribute('href');
-                }
-            }
-            foreach ($links as $link) {
-                if ($link->hasAttribute('href') && strpos($link->getAttribute('href'), 'favicon') !== false) {
-                    return $link->getAttribute('href');
+                switch (true) {
+                    case $link->hasAttribute('rel') && strtolower($link->getAttribute('rel')) === 'shortcut icon':
+                    case $link->hasAttribute('rel') && strtolower($link->getAttribute('rel')) === 'icon':
+                    case $link->hasAttribute('href') && strpos($link->getAttribute('href'), 'favicon') !== false:
+                        return trim($link->getAttribute('href'));
                 }
             }
         }
 
-        return '';
+        return $favicon;
     }
 
     /**
