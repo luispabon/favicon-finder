@@ -22,6 +22,7 @@ use Throwable;
 class Favicon
 {
     private const GUZZLE_OPTIONS = ['allow_redirects' => true];
+    private const DEFAULT_CACHE_TTL = 86400;
 
     /** @var ClientInterface */
     private $guzzle;
@@ -32,7 +33,7 @@ class Favicon
     /** @var int */
     private $cacheTtl;
 
-    public function __construct(ClientInterface $guzzle, CacheInterface $cache, int $cacheTtl = 86400)
+    public function __construct(ClientInterface $guzzle, CacheInterface $cache, int $cacheTtl = self::DEFAULT_CACHE_TTL)
     {
         $this->guzzle   = $guzzle;
         $this->cache    = $cache;
@@ -100,7 +101,7 @@ class Favicon
      */
     private function findIconInPage(string $baseUrl): ?string
     {
-        $favicon = trim($this->parseIconOffPage($baseUrl));
+        $favicon = $this->parseIconOffPage($baseUrl);
 
         if ($favicon === '') {
             return null;
@@ -155,7 +156,7 @@ class Favicon
                     case $link->hasAttribute('rel') && strtolower($link->getAttribute('rel')) === 'shortcut icon':
                     case $link->hasAttribute('rel') && strtolower($link->getAttribute('rel')) === 'icon':
                     case $link->hasAttribute('href') && strpos($link->getAttribute('href'), 'favicon') !== false:
-                        return trim($link->getAttribute('href'));
+                        return $link->getAttribute('href');
                 }
             }
         }
