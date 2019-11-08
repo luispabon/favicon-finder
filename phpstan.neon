@@ -5,3 +5,5 @@ parameters:
   # This enables extra-strictness
   includes:
     - vendor/phpstan/phpstan-strict-rules/rules.neon
+  ignoreErrors:
+    - '#PHPDoc tag @throws with type Psr\\SimpleCache\\InvalidArgumentException is not subtype#'
