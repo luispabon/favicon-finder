@@ -8,6 +8,7 @@ outputs:
 
 params:
   CODECOV_TOKEN:
+  COMPOSER_ARGS: -o install
 
 image_resource:
   type: docker-image

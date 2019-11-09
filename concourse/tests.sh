@@ -14,7 +14,7 @@ apt-get update
 apt-get install -y php-xdebug make
 phpdismod xdebug
 
-composer -o install
+composer ${COMPOSER_ARGS}
 
 # Static analysis, unit tests
 make all
