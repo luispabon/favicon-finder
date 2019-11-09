@@ -8,6 +8,9 @@ image_resource:
     source:
         repository: phpdockerio/php72-cli
 
+params:
+    COMPOSER_EXTRA_ARGS: --prefer-lowest
+
 caches:
     - path: code/vendor
 

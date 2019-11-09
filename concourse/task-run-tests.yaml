@@ -8,6 +8,7 @@ outputs:
 
 params:
   CODECOV_TOKEN:
+  COMPOSER_EXTRA_ARGS:
 
 image_resource:
   type: docker-image
