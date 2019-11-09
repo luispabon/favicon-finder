@@ -8,7 +8,7 @@ image_resource:
     source:
         repository: phpdockerio/php73-cli
 params:
-    COMPOSER_EXTRA_ARGS: --prefer-lowest
+    COMPOSER_ARGS: update --prefer-lowest
 
 caches:
     - path: code/vendor
