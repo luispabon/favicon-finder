@@ -111,7 +111,7 @@ class Favicon
         }
 
         // Make sure the favicon is an absolute URL.
-        if ($favicon && filter_var($favicon, FILTER_VALIDATE_URL) === false) {
+        if (filter_var($favicon, FILTER_VALIDATE_URL) === false) {
             $favicon = rtrim($url->getBaseUrl(), '/') . '/' . ltrim($favicon, '/');
         }
 
