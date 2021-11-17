@@ -125,16 +125,16 @@ class FaviconTest extends TestCase
             ->willReturn(null);
 
         $this->guzzleMock
-            ->expects(self::at(0))
+            ->expects(self::exactly(2))
             ->method('request')
-            ->with('HEAD', $expectedDefaultFavicon)
-            ->willReturn(new Response(404));
-
-        $this->guzzleMock
-            ->expects(self::at(1))
-            ->method('request')
-            ->with('GET', $expectedBaseUrl)
-            ->willReturn(new Response(200, [], $html));
+            ->withConsecutive(
+                ['HEAD', $expectedDefaultFavicon],
+                ['GET', $expectedBaseUrl],
+            )
+            ->willReturnOnConsecutiveCalls(
+                new Response(404),
+                new Response(200, [], $html),
+            );
 
         $this->cacheMock
             ->expects(self::once())

@@ -1,9 +1,5 @@
 parameters:
-  autoload_files:
-    - '%rootDir%/../../autoload.php'
-
-  # This enables extra-strictness
-  includes:
-    - vendor/phpstan/phpstan-strict-rules/rules.neon
+  excludePaths:
+    - src/DummyCache.php
   ignoreErrors:
     - '#PHPDoc tag @throws with type Psr\\SimpleCache\\InvalidArgumentException is not subtype#'
