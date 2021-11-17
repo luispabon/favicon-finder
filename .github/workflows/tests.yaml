@@ -18,14 +18,12 @@ jobs:
     strategy:
       matrix:
         include:
-#          - container_image: phpdockerio/php80-cli
-#            xdebug_package: php8.0-xdebug
+          - container_image: phpdockerio/php80-cli
+            xdebug_package: php8.0-xdebug
           - container_image: phpdockerio/php74-cli
             xdebug_package: php7.4-xdebug
           - container_image: phpdockerio/php73-cli
             xdebug_package: php7.3-xdebug
-          - container_image: phpdockerio/php72-cli
-            xdebug_package: php7.2-xdebug
 
     env:
       PHP_CONTAINER: ${{ matrix.container_image }}
