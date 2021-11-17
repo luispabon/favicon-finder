@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace FaviconFinder;
 
 use DOMDocument;
-use DOMNode;
+use DOMElement;
 use GuzzleHttp\ClientInterface;
 use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException as SimpleCacheInvalidArgumentException;
@@ -147,7 +147,7 @@ class Favicon
         if (@$dom->loadHTML($head)) {
             $links = $dom->getElementsByTagName('link');
             foreach ($links as $link) {
-                /** @var DOMNode $link */
+                /** @var DOMElement $link */
                 switch (true) {
                     case $link->hasAttribute('rel') && strtolower($link->getAttribute('rel')) === 'shortcut icon':
                     case $link->hasAttribute('rel') && strtolower($link->getAttribute('rel')) === 'icon':
