@@ -16,11 +16,11 @@ Here are the changes you can see in this version:
   * Only return favicon paths, when found
   * PSR-16: Simple Cache support
   * More extensive HTML scraping tests
-  * PHP 7.2+ support
+  * PHP 7.3+ support
 
 ## Requirements
 
-- [PHP 7.2](http://php.net/)
+- [PHP 7.3](http://php.net/)
 - [php-xml](http://php.net/manual/fr/refs.xml.php) extension: parse HTML content
 - [php-curl](https://www.php.net/manual/en/curl.installation.php)
 - [Guzzle](https://github.com/guzzle/guzzle)
