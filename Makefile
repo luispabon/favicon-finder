@@ -8,6 +8,9 @@ all: static-analysis coverage-tests mutation-tests
 prep-ci:
 	$(PHP_RUN) composer -o install
 
+unit-tests:
+	$(PHP_RUN) vendor/bin/phpunit --testdox --colors=always
+
 coverage-tests:
 	$(PHP_RUN) bash -c " \
 		apt update && \
