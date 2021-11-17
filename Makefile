@@ -1,5 +1,5 @@
-PHP_CONTAINER?="phpdockerio/php80-cli"
-XDEBUG_PACKAGE?="php8.0-xdebug"
+PHP_CONTAINER?="phpdockerio/php74-cli"
+XDEBUG_PACKAGE?="php7.4-xdebug"
 
 PHP_RUN=docker run --rm -e XDEBUG_MODE=coverage -v "$(PWD):/workdir" -w "/workdir" --rm $(PHP_CONTAINER)
 
