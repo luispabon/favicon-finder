@@ -9,10 +9,13 @@ prep-ci:
 	$(PHP_RUN) composer -o install
 
 coverage-tests:
-	php -d zend_extension=xdebug.so vendor/bin/phpunit --testdox
+	$(PHP_RUN) bash -c " \
+		apt update && \
+		apt install $(XDEBUG_PACKAGE) && \
+		vendor/bin/phpunit --testdox --colors=always"
 
 mutation-tests:
-	vendor/bin/infection --coverage=reports/infection --threads=2 -s --min-msi=95 --min-covered-msi=95
+	$(PHP_RUN) vendor/bin/infection --coverage=reports/infection --threads=2 -s --min-msi=95 --min-covered-msi=95
 
 static-analysis:
-	vendor/bin/phpstan -v analyse -l 7 src -c phpstan.neon  && printf "\n ${bold}PHPStan:${normal} static analysis good\n\n" || exit 1
+	$(PHP_RUN) vendor/bin/phpstan -v analyse -l 7 src -c phpstan.neon  && printf "\n ${bold}PHPStan:${normal} static analysis good\n\n" || exit 1

@@ -24,6 +24,8 @@ jobs:
             xdebug_package: php7.4-xdebug
           - container_image: phpdockerio/php73-cli
             xdebug_package: php7.3-xdebug
+          - container_image: phpdockerio/php72-cli
+            xdebug_package: php7.2-xdebug
 
     env:
       PHP_CONTAINER: ${{ matrix.container_image }}
