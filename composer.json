@@ -35,7 +35,7 @@
   },
   "require-dev": {
     "symfony/var-dumper": "^4.3",
-    "phpunit/phpunit": "^9.5.10",
+    "phpunit/phpunit": "9.2.*",
     "guzzlehttp/psr7": "^1.6",
     "infection/infection": "^0.18",
     "phpstan/phpstan": "^1.0"
