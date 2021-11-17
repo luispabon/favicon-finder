@@ -1,10 +1,21 @@
-all: run-phpstan run-unit-tests run-infection
+PHP_CONTAINER?="phpdockerio/php74-cli"
+XDEBUG_PACKAGE?="php7.4-xdebug"
 
-run-unit-tests:
-	php -d zend_extension=xdebug.so vendor/bin/phpunit --testdox
+PHP_RUN=docker run --rm -e XDEBUG_MODE=coverage -v "$(PWD):/workdir" -w "/workdir" --rm $(PHP_CONTAINER)
 
-run-infection:
-	vendor/bin/infection --coverage=reports/infection --threads=2 -s --min-msi=95 --min-covered-msi=95
+all: static-analysis coverage-tests mutation-tests
 
-run-phpstan:
-	vendor/bin/phpstan -v analyse -l 7 src -c phpstan.neon  && printf "\n ${bold}PHPStan:${normal} static analysis good\n\n" || exit 1
+prep-ci:
+	$(PHP_RUN) composer -o install
+
+coverage-tests:
+	$(PHP_RUN) bash -c " \
+		apt update && \
+		apt install $(XDEBUG_PACKAGE) && \
+		vendor/bin/phpunit --testdox --colors=always"
+
+mutation-tests:
+	$(PHP_RUN) vendor/bin/infection --coverage=reports/infection --threads=2 -s --min-msi=95 --min-covered-msi=95
+
+static-analysis:
+	$(PHP_RUN) vendor/bin/phpstan -v analyse -l 7 src -c phpstan.neon  && printf "\n ${bold}PHPStan:${normal} static analysis good\n\n" || exit 1
